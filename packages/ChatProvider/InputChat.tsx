@@ -51,7 +51,7 @@ class WrapInputChat extends Component<ISwapInputChatProps, IState> {
   constructor(props: ISwapInputChatProps) {
     super(props);
     const {width} = props;
-    this.animatedWidth = new Animated.Value(width - 180);
+    this.animatedWidth = new Animated.Value(width - 188);
     this.animatedExtendsion = new Animated.Value(0);
     this.animated = new Animated.ValueXY({x: 0, y: 0});
     this.animatedButtonSend = new Animated.Value(0);
@@ -101,7 +101,7 @@ class WrapInputChat extends Component<ISwapInputChatProps, IState> {
         toValue: 50,
         duration: 0,
       }),
-      animatedSpringLayout(this.animatedWidth, width - 102),
+      animatedSpringLayout(this.animatedWidth, width - 110),
     ]).start();
   };
 
@@ -116,7 +116,7 @@ class WrapInputChat extends Component<ISwapInputChatProps, IState> {
         toValue: 50,
         duration: 0,
       }),
-      animatedSpringLayout(this.animatedWidth, width - 102),
+      animatedSpringLayout(this.animatedWidth, width - 110),
     ]).start();
   };
 
@@ -128,7 +128,7 @@ class WrapInputChat extends Component<ISwapInputChatProps, IState> {
         toValue: 1,
         duration: 0,
       }),
-      animatedSpringLayout(this.animatedWidth, width - 180),
+      animatedSpringLayout(this.animatedWidth, width - 188),
     ]).start();
   };
 

@@ -1,4 +1,5 @@
-import {IconIon, IconSomeWhere} from '@/utils';
+import Text from '@/lib/Text';
+import {IconIon} from '@/utils';
 import React, {Component} from 'react';
 import {Animated, Pressable, StyleSheet, View} from 'react-native';
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -38,7 +39,6 @@ class IconSend extends Component<IIconSendProps> {
         <AnimatedPressable
           style={[
             styles.iconSendView,
-            styles.iconSendLike,
             {
               transform: [
                 {scale: animatedIconLike},
@@ -47,7 +47,7 @@ class IconSend extends Component<IIconSendProps> {
               opacity: animatedIconLike,
             },
           ]}>
-          <IconSomeWhere name="thumbs-up" style={[styles.iconLike, {color}]} />
+          <Text style={[styles.iconLike, {color}]}>😍</Text>
         </AnimatedPressable>
       </View>
     );
@@ -56,24 +56,22 @@ class IconSend extends Component<IIconSendProps> {
 
 const styles = StyleSheet.create({
   viewButtonSend: {
-    width: 50,
+    width: 58,
     height: 35,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     position: 'relative',
   },
   iconSend: {
     fontSize: 25,
   },
-  iconSendLike: {
-    paddingBottom: 4,
-  },
   iconLike: {
-    fontSize: 29,
+    fontSize: 26,
   },
   iconSendView: {
     position: 'absolute',
+    right: 10
   },
 });
 

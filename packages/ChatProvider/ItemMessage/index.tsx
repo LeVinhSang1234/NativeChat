@@ -3,7 +3,8 @@ import {IconIon} from '@/utils';
 import {backgroundIconChat} from '@/utils/variables';
 import React, {Component} from 'react';
 import {Image, StyleSheet, View, ViewStyle} from 'react-native';
-import Text from '../Text';
+import Text from '../../lib/Text';
+import ImageChat from '../ImageChat';
 
 export interface IMessageProps {
   _id: number | string;
@@ -39,25 +40,24 @@ export interface IItemMessageProps {
     id?: string | number;
     url_avatar?: string;
   };
+  isLastMessage?: boolean;
 }
 
 class ItemMessage extends Component<IItemMessageProps> {
   shouldComponentUpdate(nProps: IItemMessageProps) {
-    const {message, user, messageNext, messagePrevious} = nProps;
+    const {message, user, messageNext, messagePrevious, isLastMessage} = nProps;
     return (
       message !== nProps.message ||
       user !== nProps.user ||
       messagePrevious !== nProps.messagePrevious ||
-      messageNext !== nProps.messageNext
+      messageNext !== nProps.messageNext ||
+      isLastMessage !== nProps.isLastMessage
     );
   }
 
   renderIconSend = () => {
-    const {message, user, messageNext} = this.props;
+    const {message, user} = this.props;
     const {processSending, sended, received} = message;
-    if (message.user._id === messageNext?.user?._id) {
-      return <View style={styles.avatarViewedOne} />;
-    }
     if (message.viewed?.length) {
       if (message.viewed?.length < 2) {
         return (
@@ -102,7 +102,7 @@ class ItemMessage extends Component<IItemMessageProps> {
   };
 
   renderMessageFromMe = (width: number) => {
-    const {message, messageNext, messagePrevious} = this.props;
+    const {message, messageNext, messagePrevious, isLastMessage} = this.props;
     const isNextFromMe = message.user._id === messageNext?.user?._id;
     const isPreviousFromMe = message.user._id === messagePrevious?.user?._id;
     let styleContainer: ViewStyle =
@@ -125,7 +125,6 @@ class ItemMessage extends Component<IItemMessageProps> {
         ]}>
         <View style={{width: width - 100}}>
           <View style={[styles.message, styles.messageLeft]}>
-            {this.renderFiles()}
             {message.text ? (
               <View
                 style={[
@@ -135,8 +134,15 @@ class ItemMessage extends Component<IItemMessageProps> {
                 ]}>
                 <Text style={styles.textMessageLeft}>{message.text}</Text>
               </View>
-            ) : null}
-            {this.renderIconSend()}
+            ) : (
+              this.renderFiles(styleMessage)
+            )}
+
+            {isLastMessage ? (
+              this.renderIconSend()
+            ) : (
+              <View style={styles.avatarViewedOne} />
+            )}
           </View>
         </View>
       </View>
@@ -145,6 +151,9 @@ class ItemMessage extends Component<IItemMessageProps> {
 
   renderMessageFromOther = (width: number) => {
     const {message, messageNext, messagePrevious} = this.props;
+    if (!message.text && !message.files?.length) {
+      return null;
+    }
     const isNextFromMe = message.user._id === messageNext?.user?._id;
     const isPreviousFromMe = message.user._id === messagePrevious?.user?._id;
     let styleContainer: ViewStyle =
@@ -172,8 +181,9 @@ class ItemMessage extends Component<IItemMessageProps> {
                   ]}>
                   <Text style={styles.textMessageRight}>{message.text}</Text>
                 </View>
-              ) : null}
-              {this.renderFiles()}
+              ) : (
+                this.renderFiles(styleMessage)
+              )}
             </View>
           </View>
         </View>
@@ -181,16 +191,28 @@ class ItemMessage extends Component<IItemMessageProps> {
     );
   };
 
-  renderFiles = () => {
-    // const {message} = this.props;
-    // const {files} = message;
-    // if (files?.length) {
-    //   if (files.length === 1) {
-    //     return <Image source={{uri: files[0].url}} style={styles.imageOne} />;
-    //   }
-    // }
-    // return null;
-    //todo
+  renderFiles = (styleMessage: any) => {
+    const {message} = this.props;
+    const {files} = message;
+    if (files?.length === 1) {
+      return <ImageChat style={styleMessage} uri={files[0].url} />;
+    }
+    return (
+      <View style={styles.viewFiles}>
+        {files?.map(file => (
+          <ImageChat
+            style={{
+              width: 70,
+              height: 70,
+              borderRadius: 4,
+              marginRight: 1,
+              marginBottom: 1,
+            }}
+            uri={file.url}
+          />
+        ))}
+      </View>
+    );
   };
 
   render() {
@@ -257,9 +279,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     marginHorizontal: 4,
   },
-  imageOne: {
-    width: 100,
-    height: 150,
+  viewFiles: {
+    flexDirection: 'row',
   },
 });
 

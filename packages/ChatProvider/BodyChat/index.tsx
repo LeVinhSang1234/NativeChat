@@ -50,14 +50,12 @@ class BodyChat extends Component<IBodyChatProps> {
 
   onLayout = (e: LayoutChangeEvent) => {
     const {onLayout, scrollEndFirst} = this.props;
+    onLayout?.(e);
     if (scrollEndFirst && this.firstComponent) {
       this.firstComponent = false;
       setTimeout(() => {
         this.scrollView?.scrollToEnd({animated: false});
-      }, 100);
-    }
-    if (onLayout) {
-      onLayout(e);
+      }, 0);
     }
   };
 
