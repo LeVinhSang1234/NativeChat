@@ -1,6 +1,7 @@
 import React, {Component, ReactNode, useContext} from 'react';
 import {
   Animated,
+  Easing,
   Pressable,
   StyleSheet,
   Text,
@@ -68,9 +69,19 @@ class WrapInputChat extends Component<ISwapInputChatProps, IState> {
   handleChangeText = (value: string) => {
     const {inputText} = this.state;
     if (!inputText && value) {
-      animatedSpring(this.animatedButtonSend, 1, true).start();
+      animatedTiming(this.animatedButtonSend, {
+        toValue: 1,
+        duration: 250,
+        easing: Easing.elastic(1.3),
+        nativeDrive: true,
+      }).start();
     } else if (!value && inputText) {
-      animatedSpring(this.animatedButtonSend, 0, true).start();
+      animatedTiming(this.animatedButtonSend, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.elastic(1.3),
+        nativeDrive: true,
+      }).start();
     }
     this.setState({inputText: value});
   };

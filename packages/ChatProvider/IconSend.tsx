@@ -19,6 +19,10 @@ class IconSend extends Component<IIconSendProps> {
       inputRange: [0, 1],
       outputRange: [1, 0],
     });
+    const animatedIconLikeRotate = animatedButtonSend.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '30deg'],
+    });
     return (
       <View style={styles.viewButtonSend}>
         <AnimatedPressable
@@ -36,7 +40,10 @@ class IconSend extends Component<IIconSendProps> {
             styles.iconSendView,
             styles.iconSendLike,
             {
-              transform: [{scale: animatedIconLike}],
+              transform: [
+                {scale: animatedIconLike},
+                {rotate: animatedIconLikeRotate},
+              ],
               opacity: animatedIconLike,
             },
           ]}>
