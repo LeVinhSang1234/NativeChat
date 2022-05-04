@@ -11,12 +11,7 @@ import {
 } from 'react-native';
 import {backgroundIconChat, backgroundInputChat} from '@/utils/variables';
 import bar from '@/utils/bar';
-import {
-  animatedSpring,
-  animatedSpringLayout,
-  animatedTiming,
-  IconIon,
-} from '@/utils';
+import {animatedSpringLayout, animatedTiming, IconIon} from '@/utils';
 import {ProviderChat} from './Provider';
 import {KeyboardListener} from '..';
 import Extension from './Extension';

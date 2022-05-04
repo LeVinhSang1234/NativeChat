@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import {Image, StyleSheet, View, ViewStyle} from 'react-native';
 import Text from '../../lib/Text';
 import ImageChat from '../ImageChat';
+import TextMessage from './TextMessage';
 
 export interface IMessageProps {
   _id: number | string;
@@ -27,7 +28,6 @@ export interface IMessageProps {
     };
   }[];
   sended?: boolean;
-  received?: boolean;
   processSending?: number;
 }
 
@@ -57,13 +57,15 @@ class ItemMessage extends Component<IItemMessageProps> {
 
   renderIconSend = () => {
     const {message, user} = this.props;
-    const {processSending, sended, received} = message;
-    if (message.viewed?.length) {
-      if (message.viewed?.length < 2) {
+    const {processSending, sended} = message;
+    const isOwner = user._id === message.user._id;
+    const vieweds = message.viewed?.filter(e => e.user._id! === user._id);
+    if (vieweds?.length) {
+      if (vieweds.length < 2 && isOwner) {
         return (
           <Image
             style={styles.avatarViewedOne}
-            source={{uri: user.url_avatar}}
+            source={{uri: vieweds[0].user.url_avatar}}
           />
         );
       }
@@ -72,7 +74,7 @@ class ItemMessage extends Component<IItemMessageProps> {
     if (processSending || processSending === 0) {
       return <Text>{process}</Text>;
     }
-    if (sended && received) {
+    if (sended && isOwner) {
       return (
         <IconIon
           style={styles.iconSended}
@@ -81,15 +83,27 @@ class ItemMessage extends Component<IItemMessageProps> {
         />
       );
     }
-    if (sended && !received) {
-      return (
-        <IconIon
-          style={styles.iconSended}
-          name="checkmark-circle"
-          color="#666768"
-        />
-      );
+  };
+
+  renderVieweds = () => {
+    const {message, isLastMessage} = this.props;
+    if (
+      !message.viewed ||
+      !isLastMessage ||
+      (message.viewed && message.viewed.length < 2)
+    ) {
+      return null;
     }
+    return (
+      <View style={styles.vieweds}>
+        {message.viewed?.map(v => (
+          <Image
+            style={styles.avatarViewedMany}
+            source={{uri: v.user.url_avatar}}
+          />
+        ))}
+      </View>
+    );
   };
 
   renderAvatar = () => {
@@ -126,14 +140,13 @@ class ItemMessage extends Component<IItemMessageProps> {
         <View style={{width: width - 100}}>
           <View style={[styles.message, styles.messageLeft]}>
             {message.text ? (
-              <View
-                style={[
-                  styles.contentMessage,
-                  styles.contentMessageLeft,
-                  styleMessage,
-                ]}>
-                <Text style={styles.textMessageLeft}>{message.text}</Text>
-              </View>
+              <TextMessage
+                colorMessage="#fff"
+                style={[styles.contentMessage, styles.contentMessageLeft]}
+                borderBottomRightRadius={isNextFromMe ? 2 : undefined}
+                borderTopRightRadius={isPreviousFromMe ? 2 : undefined}
+                message={message.text}
+              />
             ) : (
               this.renderFiles(styleMessage)
             )}
@@ -144,13 +157,14 @@ class ItemMessage extends Component<IItemMessageProps> {
               <View style={styles.avatarViewedOne} />
             )}
           </View>
+          {this.renderVieweds()}
         </View>
       </View>
     );
   };
 
   renderMessageFromOther = (width: number) => {
-    const {message, messageNext, messagePrevious} = this.props;
+    const {message, messageNext, messagePrevious, isLastMessage} = this.props;
     if (!message.text && !message.files?.length) {
       return null;
     }
@@ -168,24 +182,27 @@ class ItemMessage extends Component<IItemMessageProps> {
     }
     return (
       <View style={[styles.messageContainer, styles.message, styleContainer]}>
-        <View style={{width: width - 100}}>
-          <View style={[styles.message]}>
-            {this.renderAvatar()}
-            <View>
+        <View style={{width}}>
+          <View style={{width: width - 100}}>
+            <View style={[styles.message]}>
+              {this.renderAvatar()}
               {message.text ? (
-                <View
-                  style={[
-                    styles.contentMessage,
-                    styles.contentMessageRight,
-                    styleMessage,
-                  ]}>
-                  <Text style={styles.textMessageRight}>{message.text}</Text>
-                </View>
+                <TextMessage
+                  colorMessage="#000"
+                  style={[styles.contentMessage, styles.contentMessageRight]}
+                  borderBottomLeftRadius={isNextFromMe ? 2 : undefined}
+                  borderTopLeftRadius={isPreviousFromMe ? 2 : undefined}
+                  message={message.text}
+                />
               ) : (
                 this.renderFiles(styleMessage)
               )}
             </View>
           </View>
+          {isLastMessage ? (
+            <View style={styles.viewIconLast}>{this.renderIconSend()}</View>
+          ) : null}
+          {this.renderVieweds()}
         </View>
       </View>
     );
@@ -199,17 +216,8 @@ class ItemMessage extends Component<IItemMessageProps> {
     }
     return (
       <View style={styles.viewFiles}>
-        {files?.map(file => (
-          <ImageChat
-            style={{
-              width: 70,
-              height: 70,
-              borderRadius: 4,
-              marginRight: 1,
-              marginBottom: 1,
-            }}
-            uri={file.url}
-          />
+        {files?.map((file, i) => (
+          <ImageChat key={i} style={styles.imageChat} uri={file.url} />
         ))}
       </View>
     );
@@ -230,6 +238,13 @@ class ItemMessage extends Component<IItemMessageProps> {
 }
 
 const styles = StyleSheet.create({
+  imageChat: {
+    width: 70,
+    height: 70,
+    borderRadius: 4,
+    marginRight: 1,
+    marginBottom: 1,
+  },
   messageContainer: {
     marginVertical: 10,
   },
@@ -244,7 +259,6 @@ const styles = StyleSheet.create({
   contentMessage: {
     paddingVertical: 9,
     paddingHorizontal: 12,
-    borderRadius: 15,
   },
   contentMessageLeft: {
     backgroundColor: backgroundIconChat,
@@ -257,16 +271,18 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 14,
   },
-  textMessageRight: {
-    color: '#000',
-    fontWeight: '500',
-    fontSize: 14,
-  },
   avatarViewedOne: {
     width: 15,
     height: 15,
     borderRadius: 100,
     marginHorizontal: 4,
+  },
+  avatarViewedMany: {
+    width: 15,
+    height: 15,
+    borderRadius: 100,
+    marginHorizontal: 0.5,
+    backgroundColor: '#e3e3e3',
   },
   iconSended: {
     marginHorizontal: 2,
@@ -281,6 +297,16 @@ const styles = StyleSheet.create({
   },
   viewFiles: {
     flexDirection: 'row',
+  },
+  vieweds: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginRight: 4,
+  },
+  viewIconLast: {
+    width: 100,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 });
 

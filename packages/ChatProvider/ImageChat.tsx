@@ -46,7 +46,7 @@ class ImageChat extends Component<IImageChatProps, IImageChatState> {
       <View style={[styles.image, styleProps]} />
     ) : (
       <Image
-        style={[style, {borderRadius: 20}, styleProps]}
+        style={[style, styles.imageView, styleProps]}
         progressiveRenderingEnabled
         source={{uri}}
       />
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f1f1f1',
     borderRadius: 20,
   },
+  imageView: {borderRadius: 20},
 });
 
 export default ImageChat;

@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   iconSendView: {
     position: 'absolute',
-    right: 10
+    right: 10,
   },
 });
 

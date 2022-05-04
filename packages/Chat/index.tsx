@@ -1,6 +1,5 @@
 import BodyChat from '@/ChatProvider/BodyChat';
 import ItemMessage, {IMessageProps} from '@/ChatProvider/ItemMessage';
-import bar from '@/utils/bar';
 import React, {Component, Fragment} from 'react';
 import {StyleSheet, View} from 'react-native';
 
@@ -89,7 +88,6 @@ const messages: IMessageProps[] = [
         'https://scontent.fhan5-8.fna.fbcdn.net/v/t39.30808-1/267756746_1921722874696725_9131067478610767912_n.jpg?stp=dst-jpg_p320x320&_nc_cat=110&ccb=1-5&_nc_sid=7206a8&_nc_ohc=FeZJbsfBwpkAX-CXI2r&tn=KlefKtJHk0ucIYfX&_nc_ht=scontent.fhan5-8.fna&oh=00_AT_YknZCsdQolAtzHrvquWt1TJ2-ZWSOMA-L6Whc62ZECw&oe=6276E1A9',
     },
     sended: true,
-    received: true,
   },
   {
     _id: 6,
@@ -100,7 +98,32 @@ const messages: IMessageProps[] = [
         'https://scontent.fhan5-8.fna.fbcdn.net/v/t39.30808-1/267756746_1921722874696725_9131067478610767912_n.jpg?stp=dst-jpg_p320x320&_nc_cat=110&ccb=1-5&_nc_sid=7206a8&_nc_ohc=FeZJbsfBwpkAX-CXI2r&tn=KlefKtJHk0ucIYfX&_nc_ht=scontent.fhan5-8.fna&oh=00_AT_YknZCsdQolAtzHrvquWt1TJ2-ZWSOMA-L6Whc62ZECw&oe=6276E1A9',
     },
     sended: true,
-    received: false,
+  },
+  {
+    _id: 6,
+    text: 'Hello Demo Chat 2',
+    user: {
+      _id: 2,
+      url_avatar:
+        'https://scontent.fhan5-8.fna.fbcdn.net/v/t39.30808-1/267756746_1921722874696725_9131067478610767912_n.jpg?stp=dst-jpg_p320x320&_nc_cat=110&ccb=1-5&_nc_sid=7206a8&_nc_ohc=FeZJbsfBwpkAX-CXI2r&tn=KlefKtJHk0ucIYfX&_nc_ht=scontent.fhan5-8.fna&oh=00_AT_YknZCsdQolAtzHrvquWt1TJ2-ZWSOMA-L6Whc62ZECw&oe=6276E1A9',
+    },
+    sended: true,
+    viewed: [
+      {
+        user: {
+          _id: 1,
+          url_avatar:
+            'https://scontent.fhan5-8.fna.fbcdn.net/v/t39.30808-1/267756746_1921722874696725_9131067478610767912_n.jpg?stp=dst-jpg_p320x320&_nc_cat=110&ccb=1-5&_nc_sid=7206a8&_nc_ohc=FeZJbsfBwpkAX-CXI2r&tn=KlefKtJHk0ucIYfX&_nc_ht=scontent.fhan5-8.fna&oh=00_AT_YknZCsdQolAtzHrvquWt1TJ2-ZWSOMA-L6Whc62ZECw&oe=6276E1A9',
+        },
+      },
+      {
+        user: {
+          _id: 2,
+          url_avatar:
+            'https://scontent.fhan5-8.fna.fbcdn.net/v/t39.30808-1/267756746_1921722874696725_9131067478610767912_n.jpg?stp=dst-jpg_p320x320&_nc_cat=110&ccb=1-5&_nc_sid=7206a8&_nc_ohc=FeZJbsfBwpkAX-CXI2r&tn=KlefKtJHk0ucIYfX&_nc_ht=scontent.fhan5-8.fna&oh=00_AT_YknZCsdQolAtzHrvquWt1TJ2-ZWSOMA-L6Whc62ZECw&oe=6276E1A9',
+        },
+      },
+    ],
   },
 ];
 
