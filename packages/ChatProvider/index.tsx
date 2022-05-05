@@ -7,9 +7,11 @@ import {
   Dimensions,
   LayoutChangeEvent,
   Modal,
+  useColorScheme,
 } from 'react-native';
 import {Camera} from '..';
 import {ProviderChat} from './Provider';
+import {theme} from './theme';
 
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
@@ -25,8 +27,11 @@ interface IState {
   height: number;
 }
 
-class ChatProvider extends Component<IProps, IState> {
-  constructor(props: IProps) {
+class SwapChatProvider extends Component<
+  IProps & {colorScheme: 'light' | 'dark'},
+  IState
+> {
+  constructor(props: IProps & {colorScheme: 'light' | 'dark'}) {
     super(props);
     this.state = {
       loading: true,
@@ -47,11 +52,17 @@ class ChatProvider extends Component<IProps, IState> {
   };
 
   render() {
-    const {children} = this.props;
+    const {children, colorScheme} = this.props;
     const {loading, width, height, isCamera} = this.state;
     return (
       <ProviderChat.Provider
-        value={{width, height, toggleCamera: this.toggleCamera}}>
+        value={{
+          width,
+          height,
+          toggleCamera: this.toggleCamera,
+          theme,
+          colorScheme,
+        }}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
         </View>
@@ -62,6 +73,11 @@ class ChatProvider extends Component<IProps, IState> {
     );
   }
 }
+
+const ChatProvider = (props: IProps) => {
+  const colorScheme: 'light' | 'dark' = useColorScheme() || 'light';
+  return <SwapChatProvider {...props} colorScheme={colorScheme} />;
+};
 
 const styles = StyleSheet.create({
   view: {

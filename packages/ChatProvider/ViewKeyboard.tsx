@@ -31,9 +31,7 @@ class ViewKeyboard extends Component<ISwapView> {
     this.animatedView = new Animated.Value(0);
   }
 
-  shouldComponentUpdate(
-    nProps: IViewKeyboardProps & {width: number; colorScheme: 'light' | 'dark'},
-  ) {
+  shouldComponentUpdate(nProps: ISwapView) {
     const {keyboardDistance, backgroundColor, inputToolbar} = this.props;
     return (
       backgroundColor !== nProps.backgroundColor ||
@@ -83,8 +81,8 @@ class ViewKeyboard extends Component<ISwapView> {
     return (
       <ProviderChat.Consumer>
         {({width}) => (
-          <View onLayout={this.onLayout}>
-            <View style={[styles.blurView]}>{this.renderInput()}</View>
+          <View style={[styles.view, {width}]} onLayout={this.onLayout}>
+            {this.renderInput()}
             <Animated.View
               style={{height: this.animatedView, width, backgroundColor}}>
               <KeyboardListener
@@ -101,10 +99,6 @@ class ViewKeyboard extends Component<ISwapView> {
 
 const styles = StyleSheet.create({
   view: {
-    position: 'relative',
-  },
-  blurView: {
-    zIndex: 1,
     position: 'relative',
   },
 });

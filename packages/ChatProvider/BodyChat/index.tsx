@@ -2,12 +2,14 @@ import ViewKeyboard from '@/ChatProvider/ViewKeyboard';
 import bar from '@/utils/bar';
 import React, {Component, Fragment} from 'react';
 import {
+  ImageBackground,
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
   ScrollViewProps,
 } from 'react-native';
+import {IProviderChat, ProviderChat} from '../Provider';
 
 interface IBodyChatProps extends ScrollViewProps {
   scrollEndFirst?: boolean;
@@ -77,23 +79,33 @@ class BodyChat extends Component<IBodyChatProps> {
       ...props
     } = this.props;
     return (
-      <Fragment>
-        <ScrollView
-          {...props}
-          onScroll={this.handleScroll}
-          onLayout={this.onLayout}
-          ref={ref => {
-            this.scrollView = ref;
-          }}
-          scrollEventThrottle={scrollEventThrottle || 200}>
-          {children}
-        </ScrollView>
-        <ViewKeyboard
-          inputToolbar={inputToolbar}
-          onHeightChange={this.onHeightChange}
-          keyboardDistance={keyboardDistance || bar.bottomHeight - 15}
-        />
-      </Fragment>
+      <ProviderChat.Consumer>
+        {({theme}: IProviderChat) => {
+          return (
+            <Fragment>
+              <ScrollView
+                {...props}
+                onScroll={this.handleScroll}
+                onLayout={this.onLayout}
+                ref={ref => {
+                  this.scrollView = ref;
+                }}
+                scrollEventThrottle={scrollEventThrottle || 200}>
+                <ImageBackground
+                  source={{uri: theme.chatBody?.imageBackground?.uri}}
+                  style={{backgroundColor: theme.chatBody?.backgroundColor}}>
+                  {children}
+                </ImageBackground>
+              </ScrollView>
+              <ViewKeyboard
+                inputToolbar={inputToolbar}
+                onHeightChange={this.onHeightChange}
+                keyboardDistance={keyboardDistance || bar.bottomHeight - 15}
+              />
+            </Fragment>
+          );
+        }}
+      </ProviderChat.Consumer>
     );
   }
 }
