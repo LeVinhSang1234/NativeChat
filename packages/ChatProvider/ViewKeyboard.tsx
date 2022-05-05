@@ -4,6 +4,7 @@ import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
 import {
   Animated,
+  Keyboard,
   KeyboardEvent,
   LayoutChangeEvent,
   StyleSheet,
@@ -25,13 +26,15 @@ interface IViewKeyboardProps {
 interface ISwapView extends IViewKeyboardProps {}
 
 class ViewKeyboard extends Component<ISwapView> {
-  animatedView: Animated.Value;
+  animatedView: Animated.Value | any;
   initApp: any;
   hPre: any;
   hNow: any;
+  keepKeyboard: boolean;
   constructor(props: ISwapView) {
     super(props);
     this.animatedView = new Animated.Value(bar.bottomHeight);
+    this.keepKeyboard = false;
   }
 
   shouldComponentUpdate(nProps: ISwapView) {
@@ -43,6 +46,7 @@ class ViewKeyboard extends Component<ISwapView> {
   }
 
   onWillShow = (event: KeyboardEvent) => {
+    this.keepKeyboard = false;
     const {endCoordinates} = event;
     const {keyboardDistance = 0} = this.props;
     animatedSpringLayout(
@@ -52,7 +56,34 @@ class ViewKeyboard extends Component<ISwapView> {
   };
 
   onWillHide = () => {
+    if (this.keepKeyboard) {
+      return;
+    }
     animatedSpringLayout(this.animatedView, bar.bottomHeight).start();
+  };
+
+  isKeyboardOpen = (): {isOpen: boolean; height: number} => {
+    return {
+      isOpen: this.animatedView._value > 34,
+      height: this.animatedView._value,
+    };
+  };
+
+  toggleImage = (height: number, callback?: () => any) => {
+    this.keepKeyboard = !!height;
+    Keyboard.dismiss();
+    if (height === 0) {
+      animatedSpringLayout(this.animatedView, bar.bottomHeight).start();
+    } else {
+      const {keyboardDistance = 0} = this.props;
+      if (this.animatedView._value === bar.bottomHeight && height > 0) {
+        animatedSpringLayout(
+          this.animatedView,
+          height - keyboardDistance,
+        ).start();
+      }
+    }
+    callback?.();
   };
 
   onLayout = (event: LayoutChangeEvent) => {

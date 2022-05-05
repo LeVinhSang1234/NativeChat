@@ -8,6 +8,7 @@ export declare type IProviderChat = {
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
+  toggleImage: (height: number) => any;
   iconFastSend?: string;
 };
 
@@ -15,6 +16,7 @@ const initValue: IProviderChat = {
   width: Dimensions.get('screen').width,
   height: Dimensions.get('screen').height,
   toggleCamera: (_flag: boolean) => null,
+  toggleImage: (_flag: number) => null,
   theme,
   colorScheme: 'light',
   iconFastSend: '',

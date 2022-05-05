@@ -1,31 +1,60 @@
 import {ProviderChat} from '@/ChatProvider/Provider';
+import {ProviderKeyboardView} from '@/ChatProvider/ViewKeyboardProvider';
+import KeyboardListener from '@/lib/KeyboardListener';
 import {IconIon} from '@/utils';
 import {backgroundIconChat} from '@/utils/variables';
 import React, {Component} from 'react';
-import {Animated, StyleSheet, View, Pressable} from 'react-native';
+import {
+  Animated,
+  StyleSheet,
+  View,
+  Pressable,
+  KeyboardEvent,
+} from 'react-native';
 
 interface IExtensionProps {
   animated: Animated.Value;
 }
 
 class Extension extends Component<IExtensionProps> {
+  heightKeyboard: number;
+  constructor(props: IExtensionProps) {
+    super(props);
+    this.heightKeyboard = 250;
+  }
+
+  onWillShowKeyboard = ({endCoordinates}: KeyboardEvent) => {
+    this.heightKeyboard = endCoordinates.height;
+  };
+
   render() {
     return (
       <ProviderChat.Consumer>
-        {({toggleCamera}) => (
-          <View style={[styles.view]}>
-            <Pressable
-              style={[styles.viewIcon, styles.flexStart]}
-              onPress={() => toggleCamera(true)}>
-              <IconIon style={styles.icon} name="camera" />
-            </Pressable>
-            <View style={styles.viewIcon}>
-              <IconIon style={styles.icon2} name="image" />
-            </View>
-            <View style={styles.viewIcon}>
-              <IconIon style={styles.icon2} name="mic" />
-            </View>
-          </View>
+        {({toggleCamera, toggleImage}) => (
+          <ProviderKeyboardView.Consumer>
+            {({toggleKeyboard}) => (
+              <View style={[styles.view]}>
+                <Pressable
+                  style={[styles.viewIcon, styles.flexStart]}
+                  onPress={() => toggleCamera(true)}>
+                  <IconIon style={styles.icon} name="camera" />
+                </Pressable>
+                <Pressable
+                  style={styles.viewIcon}
+                  onPress={() => {
+                    toggleKeyboard(this.heightKeyboard, () => {
+                      toggleImage(this.heightKeyboard);
+                    });
+                  }}>
+                  <IconIon style={styles.icon2} name="image" />
+                </Pressable>
+                <View style={styles.viewIcon}>
+                  <IconIon style={styles.icon2} name="mic" />
+                </View>
+                <KeyboardListener onWillShow={this.onWillShowKeyboard} />
+              </View>
+            )}
+          </ProviderKeyboardView.Consumer>
         )}
       </ProviderChat.Consumer>
     );

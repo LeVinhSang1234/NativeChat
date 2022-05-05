@@ -1,4 +1,4 @@
-import {appConnect} from '@/utils';
+import {animatedSpringLayout, animatedTiming, appConnect} from '@/utils';
 import React, {Component} from 'react';
 import {
   View,
@@ -8,8 +8,11 @@ import {
   LayoutChangeEvent,
   Modal,
   useColorScheme,
+  Animated,
+  KeyboardEvent,
 } from 'react-native';
-import {Camera} from '..';
+import {Camera, KeyboardListener} from '..';
+import BottomListImage from './BottomListImage';
 import {ProviderChat} from './Provider';
 import {theme} from './theme';
 
@@ -18,7 +21,7 @@ LogBox.ignoreLogs([
   'ColorPropType will be removed',
 ]);
 
-interface IProps {}
+export interface IChatProviderProps {}
 
 interface IState {
   loading: boolean;
@@ -27,11 +30,14 @@ interface IState {
   height: number;
 }
 
-class SwapChatProvider extends Component<
-  IProps & {colorScheme: 'light' | 'dark'},
-  IState
-> {
-  constructor(props: IProps & {colorScheme: 'light' | 'dark'}) {
+interface IPropsChatSwap extends IChatProviderProps {
+  colorScheme: 'light' | 'dark';
+}
+
+class SwapChatProvider extends Component<IPropsChatSwap, IState> {
+  animateImage: Animated.Value;
+  timeout?: NodeJS.Timeout;
+  constructor(props: IPropsChatSwap) {
     super(props);
     this.state = {
       loading: true,
@@ -39,6 +45,7 @@ class SwapChatProvider extends Component<
       height: Dimensions.get('screen').height,
       isCamera: false,
     };
+    this.animateImage = new Animated.Value(0);
   }
 
   handleLayout = ({nativeEvent}: LayoutChangeEvent) => {
@@ -51,6 +58,21 @@ class SwapChatProvider extends Component<
     this.setState({isCamera: flag});
   };
 
+  toggleImage = (height: number) => {
+    animatedSpringLayout(this.animateImage, height).start();
+  };
+
+  onWillShowKeyboard = ({duration}: KeyboardEvent) => {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = undefined;
+    }
+    this.timeout = setTimeout(() => {
+      this.timeout = undefined;
+      animatedTiming(this.animateImage, {toValue: 0, duration: 0}).start();
+    }, duration);
+  };
+
   render() {
     const {children, colorScheme} = this.props;
     const {loading, width, height, isCamera} = this.state;
@@ -60,21 +82,24 @@ class SwapChatProvider extends Component<
           width,
           height,
           toggleCamera: this.toggleCamera,
+          toggleImage: this.toggleImage,
           theme,
           colorScheme,
         }}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
         </View>
+        <BottomListImage animateImage={this.animateImage} />
         <Modal visible={isCamera}>
           <Camera defaultOpen />
         </Modal>
+        <KeyboardListener onWillShow={this.onWillShowKeyboard} />
       </ProviderChat.Provider>
     );
   }
 }
 
-const ChatProvider = (props: IProps) => {
+const ChatProvider = (props: IChatProviderProps) => {
   const colorScheme: 'light' | 'dark' = useColorScheme() || 'light';
   return <SwapChatProvider {...props} colorScheme={colorScheme} />;
 };
