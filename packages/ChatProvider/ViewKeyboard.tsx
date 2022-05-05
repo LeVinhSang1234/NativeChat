@@ -75,16 +75,14 @@ class ViewKeyboard extends Component<ISwapView> {
   toggleImage = (height: number, callback?: () => any) => {
     this.keepKeyboard = !!height;
     Keyboard.dismiss();
-    if (height === 0) {
+    if (height === 0 || height < 0) {
       animatedSpringLayout(this.animatedView, bar.bottomHeight).start();
     } else {
       const {keyboardDistance = 0} = this.props;
-      if (this.animatedView._value === bar.bottomHeight && height > 0) {
-        animatedSpringLayout(
-          this.animatedView,
-          height - keyboardDistance,
-        ).start();
-      }
+      animatedSpringLayout(
+        this.animatedView,
+        height - keyboardDistance,
+      ).start();
     }
     callback?.();
   };

@@ -9,6 +9,7 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  Vibration,
   View,
 } from 'react-native';
 import {ProviderChat} from '../Provider';
@@ -28,7 +29,10 @@ class BottomListImage extends Component<IBottomListImageProps> {
     this.isSwipeUp = false;
   }
 
-  handleTouchMove = ({nativeEvent}: GestureResponderEvent) => {
+  handleTouchMove = (
+    {nativeEvent}: GestureResponderEvent,
+    toggleKeyboard: (_h: number) => any,
+  ) => {
     if (this.previousY === undefined) {
       this.previousY = nativeEvent.pageY;
       return;
@@ -36,11 +40,15 @@ class BottomListImage extends Component<IBottomListImageProps> {
     const valueCalulator = this.previousY - nativeEvent.pageY;
     this.isSwipeUp = valueCalulator > 0;
     if (Math.abs(this.previousY - nativeEvent.pageY) >= 10) {
-      const {animateImage, heightScreen} = this.props;
+      const {animateImage, heightScreen, getHeightImage} = this.props;
       const calc = valueCalulator > 0 ? valueCalulator - 5 : valueCalulator + 5;
       let value = animateImage._value + calc;
       if (value > heightScreen - bar.topHeight - 20) {
         value = heightScreen - bar.topHeight - 20;
+      }
+      const initHeight = getHeightImage();
+      if (value < initHeight) {
+        toggleKeyboard?.(value);
       }
       animatedTiming(animateImage, {
         toValue: value,
@@ -55,12 +63,13 @@ class BottomListImage extends Component<IBottomListImageProps> {
     }
   };
 
-  handlePress = () => {
+  handlePress = (toggleKeyboard: (_h: number) => any) => {
     this.previousY = undefined;
     const {getHeightImage, animateImage, heightScreen} = this.props;
     const initHeight = getHeightImage();
     if (this.isSwipeUp) {
       if (animateImage._value > initHeight) {
+        Vibration.vibrate(100);
         animatedSpringLayout(
           animateImage,
           heightScreen - bar.topHeight - 20,
@@ -68,10 +77,12 @@ class BottomListImage extends Component<IBottomListImageProps> {
       }
     } else {
       if (animateImage._value < heightScreen - bar.topHeight - 60) {
-        if (animateImage._value < initHeight / 2) {
+        if (animateImage._value < initHeight - 10) {
           animatedSpringLayout(animateImage, 0).start();
+          toggleKeyboard?.(0);
         } else {
           animatedSpringLayout(animateImage, initHeight).start();
+          toggleKeyboard?.(initHeight);
         }
       } else {
         animatedSpringLayout(
@@ -86,7 +97,7 @@ class BottomListImage extends Component<IBottomListImageProps> {
     const {animateImage} = this.props;
     return (
       <ProviderChat.Consumer>
-        {({colorScheme}) => {
+        {({colorScheme, toggleKeyboard}) => {
           const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
           const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
           return (
@@ -102,8 +113,8 @@ class BottomListImage extends Component<IBottomListImageProps> {
                   },
                 ]}>
                 <Pressable
-                  onTouchEnd={this.handlePress}
-                  onTouchMove={this.handleTouchMove}
+                  onTouchEnd={() => this.handlePress(toggleKeyboard)}
+                  onTouchMove={e => this.handleTouchMove(e, toggleKeyboard)}
                   style={styles.wrapDrag}>
                   <View style={[styles.lineDrag]} />
                 </Pressable>
