@@ -1,6 +1,6 @@
 import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
-import {StyleSheet, TextInput} from 'react-native';
+import {StyleSheet, TextInput, View} from 'react-native';
 import {IProviderChat, ProviderChat} from '../Provider';
 
 class InputChat extends Component {
@@ -9,11 +9,14 @@ class InputChat extends Component {
       <ProviderChat.Consumer>
         {({theme, width, colorScheme}: IProviderChat) => {
           return (
-            <BlurView
-              blurType={colorScheme}
-              style={[theme.avoidingView, styles.blur, {width}]}>
-              <TextInput style={[theme.inputChat, {width}]} />
-            </BlurView>
+            <View style={[theme.avoidingView, styles.blur, {width}]}>
+              <TextInput
+                placeholder="Aa"
+                placeholderTextColor={theme.inputChat?.placeholderTextColor}
+                multiline
+                style={[theme.inputChat?.style, theme.inputChat?.[colorScheme]]}
+              />
+            </View>
           );
         }}
       </ProviderChat.Consumer>
@@ -22,10 +25,7 @@ class InputChat extends Component {
 }
 
 const styles = StyleSheet.create({
-  blur: {
-    position: 'absolute',
-    bottom: 0,
-  },
+  blur: {},
 });
 
 export default InputChat;

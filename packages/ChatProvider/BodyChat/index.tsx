@@ -1,9 +1,8 @@
 import ViewKeyboard from '@/ChatProvider/ViewKeyboard';
 import bar from '@/utils/bar';
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import {
   ImageBackground,
-  LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
@@ -11,7 +10,6 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import InputChat from '../InputChat';
 import {IProviderChat, ProviderChat} from '../Provider';
 
 interface IBodyChatProps extends ScrollViewProps {
@@ -46,21 +44,21 @@ class BodyChat extends Component<IBodyChatProps> {
     this.scrollNow = y;
   };
 
-  onHeightChange = (hPre: number, hNow: number) => {
+  onHeightChange = (h: number = 0) => {
     this.scrollView?.scrollTo({
-      y: this.scrollNow + hNow - hPre,
+      y: this.scrollNow + h,
       animated: false,
     });
   };
 
-  onLayout = (e: LayoutChangeEvent) => {
-    const {onLayout, scrollEndFirst} = this.props;
-    onLayout?.(e);
+  onLayout = (e: any) => {
+    const {scrollEndFirst} = this.props;
+    e.persist();
     if (scrollEndFirst && this.firstComponent) {
       this.firstComponent = false;
       setTimeout(() => {
-        this.scrollView?.scrollToEnd({animated: false});
-      }, 0);
+        e.target?.scrollToEnd({animated: false});
+      }, 1);
     }
   };
 
@@ -73,47 +71,31 @@ class BodyChat extends Component<IBodyChatProps> {
     return contentSize.height - (layoutMeasurement.height + contentOffset.y);
   };
 
-  renderInput = () => {
-    const {inputToolbar} = this.props;
-    if (inputToolbar === undefined) {
-      return <InputChat />;
-    }
-    return inputToolbar;
-  };
-
   render() {
-    const {
-      children,
-      keyboardDistance,
-      scrollEventThrottle,
-      inputToolbar,
-      ...props
-    } = this.props;
+    const {children, keyboardDistance} = this.props;
     return (
       <ProviderChat.Consumer>
         {({theme}: IProviderChat) => {
           return (
-            <View style={styles.view}>
-              <View style={styles.view}>
-                <ScrollView
-                  {...props}
-                  onScroll={this.handleScroll}
-                  onLayout={this.onLayout}
-                  ref={ref => {
-                    this.scrollView = ref;
-                  }}
-                  scrollEventThrottle={scrollEventThrottle || 200}>
-                  <ImageBackground
-                    source={{uri: theme.chatBody?.imageBackground?.uri}}
-                    style={{backgroundColor: theme.chatBody?.backgroundColor}}>
-                    {children}
-                  </ImageBackground>
-                </ScrollView>
-                {this.renderInput()}
-              </View>
+            <View style={styles.view} removeClippedSubviews>
+              <ScrollView
+                removeClippedSubviews
+                style={styles.scrollView}
+                onScroll={this.handleScroll}
+                onLayout={this.onLayout}
+                ref={ref => {
+                  this.scrollView = ref;
+                }}
+                scrollEventThrottle={16}>
+                <ImageBackground
+                  source={{uri: theme.chatBody?.imageBackground?.uri}}
+                  style={{backgroundColor: theme.chatBody?.backgroundColor}}>
+                  {children}
+                </ImageBackground>
+              </ScrollView>
               <ViewKeyboard
                 onHeightChange={this.onHeightChange}
-                keyboardDistance={keyboardDistance || bar.bottomHeight}
+                keyboardDistance={keyboardDistance || 0}
               />
             </View>
           );
@@ -126,7 +108,10 @@ class BodyChat extends Component<IBodyChatProps> {
 const styles = StyleSheet.create({
   view: {
     flex: 1,
-    position: 'relative',
+    overflow: 'hidden',
+  },
+  scrollView: {
+    overflow: 'visible',
   },
 });
 

@@ -39,7 +39,7 @@ export function animatedSpringLayout(
 ) {
   return Animated.spring(animated, {
     toValue: value,
-    bounciness: 1,
+    bounciness: 0,
     overshootClamping: true,
     useNativeDriver: !!nativeDriver,
   });

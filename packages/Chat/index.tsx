@@ -71,7 +71,9 @@ class Chat extends Component<IChatProps> {
             <Text>sang</Text>
             <Text>sang</Text>
             <Text>sang</Text>
-            <Text>end</Text>
+            <View style={{backgroundColor: 'red'}}>
+              <Text>end</Text>
+            </View>
           </BodyChat>
         </View>
       </Fragment>
