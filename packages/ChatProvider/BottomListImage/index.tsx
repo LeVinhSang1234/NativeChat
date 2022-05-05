@@ -23,10 +23,12 @@ interface IBottomListImageProps {
 class BottomListImage extends Component<IBottomListImageProps> {
   previousY?: number;
   isSwipeUp: boolean;
+  animatedBackdrop: Animated.Value;
   constructor(props: IBottomListImageProps) {
     super(props);
     this.previousY = undefined;
     this.isSwipeUp = false;
+    this.animatedBackdrop = new Animated.Value(0);
   }
 
   handleTouchMove = (
@@ -47,13 +49,21 @@ class BottomListImage extends Component<IBottomListImageProps> {
         value = heightScreen - bar.topHeight - 20;
       }
       const initHeight = getHeightImage();
+      // const animatedOpacity =
+      //   (heightScreen - nativeEvent.pageY) / (heightScreen - initHeight);
       if (value < initHeight) {
         toggleKeyboard?.(value);
       }
-      animatedTiming(animateImage, {
-        toValue: value,
-        duration: Platform.OS !== 'android' ? 0 : 10,
-      }).start();
+      Animated.parallel([
+        animatedTiming(animateImage, {
+          toValue: value,
+          duration: Platform.OS !== 'android' ? 0 : 10,
+        }),
+        // animatedTiming(this.animatedBackdrop, {
+        //   toValue: animatedOpacity,
+        //   duration: Platform.OS !== 'android' ? 0 : 10,
+        // }),
+      ]).start();
       if (Platform.OS !== 'android') {
         LayoutAnimation.configureNext(
           LayoutAnimation.create(10, 'keyboard', 'opacity'),
@@ -94,7 +104,11 @@ class BottomListImage extends Component<IBottomListImageProps> {
   };
 
   render() {
-    const {animateImage} = this.props;
+    const {animateImage, heightScreen} = this.props;
+    const heightBackdrop = this.animatedBackdrop.interpolate({
+      inputRange: [0, 0.1, 1],
+      outputRange: [0, heightScreen, heightScreen],
+    });
     return (
       <ProviderChat.Consumer>
         {({colorScheme, toggleKeyboard}) => {
@@ -102,7 +116,12 @@ class BottomListImage extends Component<IBottomListImageProps> {
           const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
           return (
             <Fragment>
-              <Animated.View style={[styles.viewBackdrop]} />
+              <Animated.View
+                style={[
+                  styles.viewBackdrop,
+                  {height: heightBackdrop, opacity: this.animatedBackdrop},
+                ]}
+              />
               <Animated.View
                 style={[
                   styles.viewImage,
@@ -143,7 +162,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
     borderTopLeftRadius: 8,
   },
-  viewBackdrop: {},
+  viewBackdrop: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: '#000',
+    width: '100%',
+  },
   wrapDrag: {
     marginVertical: 4,
     flexDirection: 'row',
