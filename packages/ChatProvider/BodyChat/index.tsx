@@ -8,7 +8,10 @@ import {
   NativeSyntheticEvent,
   ScrollView,
   ScrollViewProps,
+  StyleSheet,
+  View,
 } from 'react-native';
+import InputChat from '../InputChat';
 import {IProviderChat, ProviderChat} from '../Provider';
 
 interface IBodyChatProps extends ScrollViewProps {
@@ -70,6 +73,14 @@ class BodyChat extends Component<IBodyChatProps> {
     return contentSize.height - (layoutMeasurement.height + contentOffset.y);
   };
 
+  renderInput = () => {
+    const {inputToolbar} = this.props;
+    if (inputToolbar === undefined) {
+      return <InputChat />;
+    }
+    return inputToolbar;
+  };
+
   render() {
     const {
       children,
@@ -82,32 +93,41 @@ class BodyChat extends Component<IBodyChatProps> {
       <ProviderChat.Consumer>
         {({theme}: IProviderChat) => {
           return (
-            <Fragment>
-              <ScrollView
-                {...props}
-                onScroll={this.handleScroll}
-                onLayout={this.onLayout}
-                ref={ref => {
-                  this.scrollView = ref;
-                }}
-                scrollEventThrottle={scrollEventThrottle || 200}>
-                <ImageBackground
-                  source={{uri: theme.chatBody?.imageBackground?.uri}}
-                  style={{backgroundColor: theme.chatBody?.backgroundColor}}>
-                  {children}
-                </ImageBackground>
-              </ScrollView>
+            <View style={styles.view}>
+              <View style={styles.view}>
+                <ScrollView
+                  {...props}
+                  onScroll={this.handleScroll}
+                  onLayout={this.onLayout}
+                  ref={ref => {
+                    this.scrollView = ref;
+                  }}
+                  scrollEventThrottle={scrollEventThrottle || 200}>
+                  <ImageBackground
+                    source={{uri: theme.chatBody?.imageBackground?.uri}}
+                    style={{backgroundColor: theme.chatBody?.backgroundColor}}>
+                    {children}
+                  </ImageBackground>
+                </ScrollView>
+                {this.renderInput()}
+              </View>
               <ViewKeyboard
-                inputToolbar={inputToolbar}
                 onHeightChange={this.onHeightChange}
-                keyboardDistance={keyboardDistance || bar.bottomHeight - 15}
+                keyboardDistance={keyboardDistance || bar.bottomHeight}
               />
-            </Fragment>
+            </View>
           );
         }}
       </ProviderChat.Consumer>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  view: {
+    flex: 1,
+    position: 'relative',
+  },
+});
 
 export default BodyChat;

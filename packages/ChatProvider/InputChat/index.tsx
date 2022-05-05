@@ -11,7 +11,7 @@ class InputChat extends Component {
           return (
             <BlurView
               blurType={colorScheme}
-              style={[theme.avoidingView, styles.blur, {width, top: -80}]}>
+              style={[theme.avoidingView, styles.blur, {width}]}>
               <TextInput style={[theme.inputChat, {width}]} />
             </BlurView>
           );
@@ -24,6 +24,7 @@ class InputChat extends Component {
 const styles = StyleSheet.create({
   blur: {
     position: 'absolute',
+    bottom: 0,
   },
 });
 

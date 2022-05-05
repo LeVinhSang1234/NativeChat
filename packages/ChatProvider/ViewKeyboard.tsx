@@ -1,22 +1,22 @@
 import {animatedSpringLayout} from '@/utils';
+import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
 import {
   Animated,
   KeyboardEvent,
   LayoutChangeEvent,
   StyleSheet,
-  View,
 } from 'react-native';
 import {KeyboardListener} from '..';
-import InputChat from './InputChat';
 import {ProviderChat} from './Provider';
+
+const BlurAnimated: any = Animated.createAnimatedComponent(BlurView);
 
 interface IViewKeyboardProps {
   backgroundColor?: string;
   keyboardDistance?: number;
   onLayout?: (e: LayoutChangeEvent) => any;
   onHeightChange?: (hPre: number, hNow: number) => any;
-  inputToolbar: any;
 }
 
 interface ISwapView extends IViewKeyboardProps {}
@@ -32,11 +32,10 @@ class ViewKeyboard extends Component<ISwapView> {
   }
 
   shouldComponentUpdate(nProps: ISwapView) {
-    const {keyboardDistance, backgroundColor, inputToolbar} = this.props;
+    const {keyboardDistance, backgroundColor} = this.props;
     return (
       backgroundColor !== nProps.backgroundColor ||
-      keyboardDistance !== nProps.keyboardDistance ||
-      inputToolbar !== nProps.inputToolbar
+      keyboardDistance !== nProps.keyboardDistance
     );
   }
 
@@ -68,29 +67,20 @@ class ViewKeyboard extends Component<ISwapView> {
     onHeightChange?.(this.hPre, this.hNow);
   };
 
-  renderInput = () => {
-    const {inputToolbar} = this.props;
-    if (inputToolbar === undefined) {
-      return <InputChat />;
-    }
-    return inputToolbar;
-  };
-
   render() {
     const {backgroundColor} = this.props;
     return (
       <ProviderChat.Consumer>
-        {({width}) => (
-          <View style={[styles.view, {width}]} onLayout={this.onLayout}>
-            {this.renderInput()}
-            <Animated.View
-              style={{height: this.animatedView, width, backgroundColor}}>
-              <KeyboardListener
-                onWillShow={this.onWillShow}
-                onWillHide={this.onWillHide}
-              />
-            </Animated.View>
-          </View>
+        {({width, colorScheme}) => (
+          <BlurAnimated
+            onLayout={this.onLayout}
+            blurType={colorScheme}
+            style={{height: this.animatedView, width, backgroundColor}}>
+            <KeyboardListener
+              onWillShow={this.onWillShow}
+              onWillHide={this.onWillHide}
+            />
+          </BlurAnimated>
         )}
       </ProviderChat.Consumer>
     );
