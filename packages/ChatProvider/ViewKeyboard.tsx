@@ -21,6 +21,7 @@ interface IViewKeyboardProps {
   onLayout?: (e: LayoutChangeEvent) => any;
   onHeightChange?: (h: number, animated?: boolean) => any;
   inputToolbar?: any;
+  setToggleKeyboard?: (f: any) => any;
 }
 
 interface ISwapView extends IViewKeyboardProps {}
@@ -33,6 +34,8 @@ class ViewKeyboard extends Component<ISwapView> {
   keepKeyboard: boolean;
   constructor(props: ISwapView) {
     super(props);
+    const {setToggleKeyboard} = props;
+    setToggleKeyboard?.(this.toggleImage);
     this.animatedView = new Animated.Value(bar.bottomHeight);
     this.keepKeyboard = false;
   }

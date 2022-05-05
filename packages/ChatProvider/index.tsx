@@ -28,6 +28,7 @@ interface IState {
   isCamera: boolean;
   width: number;
   height: number;
+  toggleKeyboard: (_h: number) => null;
 }
 
 interface IPropsChatSwap extends IChatProviderProps {
@@ -37,6 +38,7 @@ interface IPropsChatSwap extends IChatProviderProps {
 class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   animateImage: Animated.Value;
   timeout?: NodeJS.Timeout;
+  heightImageToggle: number;
   constructor(props: IPropsChatSwap) {
     super(props);
     this.state = {
@@ -44,8 +46,10 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       width: Dimensions.get('screen').width,
       height: Dimensions.get('screen').height,
       isCamera: false,
+      toggleKeyboard: (_h: number) => null,
     };
     this.animateImage = new Animated.Value(0);
+    this.heightImageToggle = 250;
   }
 
   handleLayout = ({nativeEvent}: LayoutChangeEvent) => {
@@ -59,6 +63,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   };
 
   toggleImage = (height: number) => {
+    this.heightImageToggle = height;
     animatedSpringLayout(this.animateImage, height).start();
   };
 
@@ -73,9 +78,17 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     }, duration);
   };
 
+  getHeightImage = () => {
+    return this.heightImageToggle;
+  };
+
+  setToggleKeyboard = (f: any) => {
+    this.setState({toggleKeyboard: f});
+  };
+
   render() {
     const {children, colorScheme} = this.props;
-    const {loading, width, height, isCamera} = this.state;
+    const {loading, width, height, isCamera, toggleKeyboard} = this.state;
     return (
       <ProviderChat.Provider
         value={{
@@ -83,13 +96,19 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
           height,
           toggleCamera: this.toggleCamera,
           toggleImage: this.toggleImage,
+          toggleKeyboard,
+          setToggleKeyboard: this.setToggleKeyboard,
           theme,
           colorScheme,
         }}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
         </View>
-        <BottomListImage animateImage={this.animateImage} />
+        <BottomListImage
+          getHeightImage={this.getHeightImage}
+          heightScreen={height}
+          animateImage={this.animateImage}
+        />
         <Modal visible={isCamera}>
           <Camera defaultOpen />
         </Modal>

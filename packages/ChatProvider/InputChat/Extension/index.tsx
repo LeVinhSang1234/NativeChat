@@ -1,5 +1,4 @@
 import {ProviderChat} from '@/ChatProvider/Provider';
-import {ProviderKeyboardView} from '@/ChatProvider/ViewKeyboardProvider';
 import KeyboardListener from '@/lib/KeyboardListener';
 import {IconIon} from '@/utils';
 import {backgroundIconChat} from '@/utils/variables';
@@ -30,31 +29,27 @@ class Extension extends Component<IExtensionProps> {
   render() {
     return (
       <ProviderChat.Consumer>
-        {({toggleCamera, toggleImage}) => (
-          <ProviderKeyboardView.Consumer>
-            {({toggleKeyboard}) => (
-              <View style={[styles.view]}>
-                <Pressable
-                  style={[styles.viewIcon, styles.flexStart]}
-                  onPress={() => toggleCamera(true)}>
-                  <IconIon style={styles.icon} name="camera" />
-                </Pressable>
-                <Pressable
-                  style={styles.viewIcon}
-                  onPress={() => {
-                    toggleKeyboard(this.heightKeyboard, () => {
-                      toggleImage(this.heightKeyboard);
-                    });
-                  }}>
-                  <IconIon style={styles.icon2} name="image" />
-                </Pressable>
-                <View style={styles.viewIcon}>
-                  <IconIon style={styles.icon2} name="mic" />
-                </View>
-                <KeyboardListener onWillShow={this.onWillShowKeyboard} />
-              </View>
-            )}
-          </ProviderKeyboardView.Consumer>
+        {({toggleCamera, toggleImage, toggleKeyboard}) => (
+          <View style={[styles.view]}>
+            <Pressable
+              style={[styles.viewIcon, styles.flexStart]}
+              onPress={() => toggleCamera(true)}>
+              <IconIon style={styles.icon} name="camera" />
+            </Pressable>
+            <Pressable
+              style={styles.viewIcon}
+              onPress={() => {
+                toggleKeyboard(this.heightKeyboard, () => {
+                  toggleImage(this.heightKeyboard);
+                });
+              }}>
+              <IconIon style={styles.icon2} name="image" />
+            </Pressable>
+            <View style={styles.viewIcon}>
+              <IconIon style={styles.icon2} name="mic" />
+            </View>
+            <KeyboardListener onWillShow={this.onWillShowKeyboard} />
+          </View>
         )}
       </ProviderChat.Consumer>
     );

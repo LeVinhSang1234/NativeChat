@@ -13,7 +13,6 @@ import {
   View,
 } from 'react-native';
 import {IProviderChat, ProviderChat} from '../Provider';
-import {ProviderKeyboardView} from '../ViewKeyboardProvider';
 
 interface IBodyChatProps extends ScrollViewProps {
   scrollEndFirst?: boolean;
@@ -72,14 +71,11 @@ class BodyChat extends Component<IBodyChatProps> {
     return contentSize.height - (layoutMeasurement.height + contentOffset.y);
   };
 
-  toggleKeyboard = (height: number, callback?: () => any) => {
-    this.viewKeyboard?.toggleImage?.(height, callback);
-  };
-
   onMouseMove = (
     {nativeEvent}: GestureResponderEvent,
     toggleImage: (h: number) => any,
     height: number,
+    toggleKeyboard: (h: number, callback?: () => any) => any,
   ) => {
     const {isOpen, height: heightKeyboard} =
       this.viewKeyboard?.isKeyboardOpen?.() || {
@@ -91,7 +87,7 @@ class BodyChat extends Component<IBodyChatProps> {
     }
     if (height - nativeEvent.pageY <= heightKeyboard) {
       Keyboard.dismiss();
-      this.toggleKeyboard(0, () => toggleImage(0));
+      toggleKeyboard(0, () => toggleImage(0));
     }
   };
 
@@ -99,45 +95,44 @@ class BodyChat extends Component<IBodyChatProps> {
     const {children, keyboardDistance} = this.props;
     return (
       <ProviderChat.Consumer>
-        {({theme, toggleImage, height}: IProviderChat) => {
+        {({
+          theme,
+          toggleImage,
+          height,
+          setToggleKeyboard,
+          toggleKeyboard,
+        }: IProviderChat) => {
           return (
-            <ProviderKeyboardView.Provider
-              value={{
-                toggleKeyboard: this.toggleKeyboard,
-              }}>
-              <View style={styles.view} removeClippedSubviews>
-                <ScrollView
-                  removeClippedSubviews
-                  style={styles.scrollView}
-                  onScroll={this.handleScroll}
-                  onLayout={this.onLayout}
-                  onTouchMove={e => this.onMouseMove(e, toggleImage, height)}
-                  ref={ref => {
-                    this.scrollView = ref;
-                  }}
-                  scrollEventThrottle={200}>
-                  <Pressable
-                    onPress={() => {
-                      this.toggleKeyboard(0, () => toggleImage(0));
+            <View style={styles.view} removeClippedSubviews>
+              <ScrollView
+                removeClippedSubviews
+                style={styles.scrollView}
+                onScroll={this.handleScroll}
+                onLayout={this.onLayout}
+                onTouchMove={e =>
+                  this.onMouseMove(e, toggleImage, height, toggleKeyboard)
+                }
+                ref={ref => {
+                  this.scrollView = ref;
+                }}
+                scrollEventThrottle={200}>
+                <Pressable
+                  onPress={() => toggleKeyboard(0, () => toggleImage(0))}>
+                  <ImageBackground
+                    source={{uri: theme.chatBody?.imageBackground?.uri}}
+                    style={{
+                      backgroundColor: theme.chatBody?.backgroundColor,
                     }}>
-                    <ImageBackground
-                      source={{uri: theme.chatBody?.imageBackground?.uri}}
-                      style={{
-                        backgroundColor: theme.chatBody?.backgroundColor,
-                      }}>
-                      {children}
-                    </ImageBackground>
-                  </Pressable>
-                </ScrollView>
-                <ViewKeyboard
-                  ref={ref => {
-                    this.viewKeyboard = ref;
-                  }}
-                  onHeightChange={this.onHeightChange}
-                  keyboardDistance={keyboardDistance || 0}
-                />
-              </View>
-            </ProviderKeyboardView.Provider>
+                    {children}
+                  </ImageBackground>
+                </Pressable>
+              </ScrollView>
+              <ViewKeyboard
+                setToggleKeyboard={setToggleKeyboard}
+                onHeightChange={this.onHeightChange}
+                keyboardDistance={keyboardDistance || 0}
+              />
+            </View>
           );
         }}
       </ProviderChat.Consumer>
