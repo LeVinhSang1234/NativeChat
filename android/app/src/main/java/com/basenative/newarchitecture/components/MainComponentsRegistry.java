@@ -1,4 +1,4 @@
-package com.basenative.newarchitecture.components;
+package com.nativechat.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

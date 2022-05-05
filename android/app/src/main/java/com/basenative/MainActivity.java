@@ -1,4 +1,4 @@
-package com.basenative;
+package com.nativechat;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
