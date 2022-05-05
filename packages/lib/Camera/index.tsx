@@ -48,9 +48,6 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
   constructor(props: ICameraProps & IProviderChat) {
     super(props);
     const {defaultOpen} = this.props;
-    if (defaultOpen) {
-      StatusBar.setHidden(true);
-    }
     this.state = {
       open: !!defaultOpen,
       typeCamera: RNCamera.Constants.Type.back,
@@ -150,6 +147,11 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
   };
 
   handleStatusCamera = async (v: any) => {
+    if (v.cameraStatus === RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
+      StatusBar.setHidden(false);
+    } else {
+      StatusBar.setHidden(true);
+    }
     this.setState({permission: v.cameraStatus});
   };
 
