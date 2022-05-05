@@ -25,11 +25,14 @@ class BodyChat extends Component<IBodyChatProps> {
   scrollNow: number;
   firstComponent: boolean;
   viewKeyboard?: ViewKeyboard | null;
+  animatedView?: ViewKeyboard | null;
+  isMoveScroll: boolean;
 
   constructor(props: IBodyChatProps) {
     super(props);
     this.scrollNow = 0;
     this.firstComponent = true;
+    this.isMoveScroll = false;
   }
 
   shouldComponentUpdate(nProps: IBodyChatProps) {
@@ -48,6 +51,9 @@ class BodyChat extends Component<IBodyChatProps> {
   };
 
   onHeightChange = (h: number = 0, animated: boolean = false) => {
+    if (this.isMoveScroll) {
+      return;
+    }
     this.scrollView?.scrollTo({y: this.scrollNow + h, animated});
   };
 
@@ -77,6 +83,7 @@ class BodyChat extends Component<IBodyChatProps> {
     height: number,
     toggleKeyboard: (h: number, callback?: () => any) => any,
   ) => {
+    this.isMoveScroll = true;
     const {isOpen, height: heightKeyboard} =
       this.viewKeyboard?.isKeyboardOpen?.() || {
         isOpen: false,
@@ -112,6 +119,9 @@ class BodyChat extends Component<IBodyChatProps> {
                 onTouchMove={e =>
                   this.onMouseMove(e, toggleImage, height, toggleKeyboard)
                 }
+                onTouchEnd={() => {
+                  this.isMoveScroll = false;
+                }}
                 ref={ref => {
                   this.scrollView = ref;
                 }}
@@ -128,6 +138,9 @@ class BodyChat extends Component<IBodyChatProps> {
                 </Pressable>
               </ScrollView>
               <ViewKeyboard
+                ref={ref => {
+                  this.viewKeyboard = ref;
+                }}
                 setToggleKeyboard={setToggleKeyboard}
                 onHeightChange={this.onHeightChange}
                 keyboardDistance={keyboardDistance || 0}
