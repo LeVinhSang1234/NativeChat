@@ -8,6 +8,7 @@ export declare type IProviderChat = {
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
+  iconFastSend?: string;
 };
 
 const initValue: IProviderChat = {
@@ -16,6 +17,7 @@ const initValue: IProviderChat = {
   toggleCamera: (_flag: boolean) => null,
   theme,
   colorScheme: 'light',
+  iconFastSend: '',
 };
 
 export const ProviderChat = createContext(initValue);

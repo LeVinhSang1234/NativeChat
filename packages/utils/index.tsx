@@ -3,6 +3,7 @@ import IconIon from 'react-native-vector-icons/Ionicons';
 import IconEvilIcons from 'react-native-vector-icons/EvilIcons';
 import IconSomeWhere from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import IconSomeWherePro from 'react-native-vector-icons/FontAwesome5Pro';
 import Video from 'react-native-video';
 import RNConvertPhAsset from 'react-native-convert-ph-asset';
@@ -15,6 +16,7 @@ export {
   MaterialIcons,
   IconSomeWherePro,
   IconEvilIcons,
+  OcticonsIcon
 };
 
 export const appConnect: {language: string} = {
@@ -68,7 +70,7 @@ export function animatedTiming(
     toValue: any;
     duration?: number;
     nativeDrive?: boolean;
-    easing?: (value: number) => number;
+    easing?: any;
     delay?: number;
   },
 ) {

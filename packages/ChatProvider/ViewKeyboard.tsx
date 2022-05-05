@@ -18,7 +18,7 @@ interface IViewKeyboardProps {
   backgroundColor?: string;
   keyboardDistance?: number;
   onLayout?: (e: LayoutChangeEvent) => any;
-  onHeightChange?: (h: number) => any;
+  onHeightChange?: (h: number, animated?: boolean) => any;
   inputToolbar?: any;
 }
 

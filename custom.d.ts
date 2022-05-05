@@ -9,6 +9,7 @@ declare module 'react-native-vector-icons/AntDesign';
 declare module 'react-native-vector-icons/Feather';
 declare module 'react-native-vector-icons/Ionicons';
 declare module 'react-native-vector-icons/EvilIcons';
+declare module 'react-native-vector-icons/Octicons';
 declare module 'rn-photos-framework';
 declare module 'react-native-video';
 declare module 'react-native-convert-ph-asset';

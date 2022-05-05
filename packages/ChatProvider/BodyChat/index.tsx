@@ -44,11 +44,8 @@ class BodyChat extends Component<IBodyChatProps> {
     this.scrollNow = y;
   };
 
-  onHeightChange = (h: number = 0) => {
-    this.scrollView?.scrollTo({
-      y: this.scrollNow + h,
-      animated: false,
-    });
+  onHeightChange = (h: number = 0, animated: boolean = false) => {
+    this.scrollView?.scrollTo({y: this.scrollNow + h, animated});
   };
 
   onLayout = (e: any) => {
@@ -86,7 +83,7 @@ class BodyChat extends Component<IBodyChatProps> {
                 ref={ref => {
                   this.scrollView = ref;
                 }}
-                scrollEventThrottle={16}>
+                scrollEventThrottle={200}>
                 <ImageBackground
                   source={{uri: theme.chatBody?.imageBackground?.uri}}
                   style={{backgroundColor: theme.chatBody?.backgroundColor}}>
