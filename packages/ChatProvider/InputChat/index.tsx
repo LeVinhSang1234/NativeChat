@@ -1,11 +1,21 @@
-import {animatedTiming} from '@/utils';
-import React, {Component, ForwardedRef, RefAttributes} from 'react';
-import {Animated, Easing, StyleSheet, TextInput, View} from 'react-native';
+import KeyboardListener from '@/lib/KeyboardListener';
+import {animatedSpringLayout, animatedTiming, IconIon} from '@/utils';
+import {backgroundIconChat} from '@/utils/variables';
+import React, {Component} from 'react';
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import {IProviderChat, useProviderChat} from '../Provider';
 import ButtonSend from './ButtonSend';
 import Extension from './Extension';
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface IInputChatProps {}
 
@@ -20,11 +30,14 @@ interface IState {
 class SwapInputChat extends Component<ISwapInputChatProps, IState> {
   animatedInput: Animated.Value;
   animatedSend: Animated.Value;
+  animatedExpand: Animated.Value;
+  keyboardShow: boolean;
   constructor(props: ISwapInputChatProps) {
     super(props);
-    const {provider} = props;
     this.animatedInput = new Animated.Value(0);
     this.animatedSend = new Animated.Value(0);
+    this.animatedExpand = new Animated.Value(0);
+    this.keyboardShow = false;
     this.state = {value: ''};
   }
 
@@ -43,20 +56,62 @@ class SwapInputChat extends Component<ISwapInputChatProps, IState> {
     this.setState({value: v});
   };
 
+  handlePressIn = () => {
+    if (!this.keyboardShow) {
+      return;
+    }
+    this.onWillShowKeyboard();
+  };
+
+  onWillShowKeyboard = () => {
+    this.keyboardShow = true;
+    Animated.parallel([
+      animatedSpringLayout(this.animatedInput, 1),
+      animatedTiming(this.animatedExpand, {toValue: 1, duration: 0}),
+    ]).start();
+  };
+
+  onWillHideKeyboard = () => {
+    this.keyboardShow = false;
+    this.handleExpandClose();
+  };
+
+  handleExpandClose = () => {
+    Animated.parallel([
+      animatedSpringLayout(this.animatedInput, 0),
+      animatedTiming(this.animatedExpand, {toValue: 0, duration: 0}),
+    ]).start();
+  };
+
   render() {
     const {value} = this.state;
     const {provider} = this.props;
     const {theme, width, colorScheme} = provider;
-
     const animatedWidthInput = this.animatedInput.interpolate({
       inputRange: [0, 1],
-      outputRange: [width - 220, width - 130],
+      outputRange: [width - 220, width - 110],
+    });
+    const animatedWidthExpand = this.animatedExpand.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 50],
     });
 
     return (
       <View style={[theme.avoidingView, styles.blur, {width}]}>
         <Extension animated={this.animatedInput} />
+        <AnimatedPressable
+          onPress={this.handleExpandClose}
+          style={[
+            styles.expand,
+            {
+              transform: [{scale: this.animatedExpand}],
+              width: animatedWidthExpand,
+            },
+          ]}>
+          <IconIon style={styles.iconExpand} name="chevron-forward" />
+        </AnimatedPressable>
         <AnimatedInput
+          onPressIn={this.handlePressIn}
           onChangeText={this.handleChangeText}
           placeholder="Aa"
           placeholderTextColor={theme.inputChat?.placeholderTextColor}
@@ -69,6 +124,10 @@ class SwapInputChat extends Component<ISwapInputChatProps, IState> {
           {value}
         </AnimatedInput>
         <ButtonSend animated={this.animatedSend} />
+        <KeyboardListener
+          onWillShow={this.onWillShowKeyboard}
+          onWillHide={this.onWillHideKeyboard}
+        />
       </View>
     );
   }
@@ -78,6 +137,18 @@ const styles = StyleSheet.create({
   blur: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+  },
+  expand: {
+    height: '100%',
+    width: 50,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingBottom: 4,
+  },
+  iconExpand: {
+    fontSize: 26,
+    color: backgroundIconChat,
   },
 });
 

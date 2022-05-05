@@ -1,12 +1,23 @@
-import {useProviderChat} from '@/ChatProvider/Provider';
-import {throwException} from '@/utils';
+import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
+import {IconIon, throwException} from '@/utils';
+import {BlurView} from '@react-native-community/blur';
 import React, {Component, ReactNode, Suspense} from 'react';
-import {GestureResponderEvent, StatusBar} from 'react-native';
+import {
+  GestureResponderEvent,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {CameraType, FlashMode, RNCamera} from 'react-native-camera';
+import {Linking} from 'react-native';
+import Text from '../Text';
 import ActionBottom from './ActionBottom';
 import ActionTop from './ActionTop';
 import FocusPoint from './FocusPoint';
 import TabClickHandle from './TabClickHandle';
+import {backgroundIconChat, backgroundIconChatDark} from '@/utils/variables';
+import bar from '@/utils/bar';
 
 const ImageCapture = React.lazy(() => import('./ImageCapture'));
 
@@ -26,27 +37,15 @@ interface IState {
   zoom: number;
   exposure: number;
   image: any;
+  permission: 'READY' | 'PENDING_AUTHORIZATION' | 'NOT_AUTHORIZED';
 }
 
-class Camera extends Component<
-  ICameraProps & {
-    width: number;
-    height: number;
-    toggleCamera: (flag: boolean) => any;
-  },
-  IState
-> {
+class Camera extends Component<ICameraProps & IProviderChat, IState> {
   camera?: RNCamera | null;
   timeout?: NodeJS.Timeout;
   focusPoint?: FocusPoint;
 
-  constructor(
-    props: ICameraProps & {
-      width: number;
-      height: number;
-      toggleCamera: (flag: boolean) => any;
-    },
-  ) {
+  constructor(props: ICameraProps & IProviderChat) {
     super(props);
     const {defaultOpen} = this.props;
     if (defaultOpen) {
@@ -62,6 +61,7 @@ class Camera extends Component<
       zoom: 0,
       exposure: -1,
       image: undefined,
+      permission: RNCamera.Constants.CameraStatus.READY,
     };
   }
 
@@ -149,6 +149,10 @@ class Camera extends Component<
     return checkFront || !cameraReady ? undefined : {x: xPoint, y: yPoint};
   };
 
+  handleStatusCamera = async (v: any) => {
+    this.setState({permission: v.cameraStatus});
+  };
+
   handleReadyCamera = () => {
     this.setState({cameraReady: true});
   };
@@ -170,12 +174,49 @@ class Camera extends Component<
   };
 
   render(): ReactNode {
-    const {open, typeCamera, flashMode, zoom, exposure, image, xPoint, yPoint} =
-      this.state;
+    const {
+      open,
+      typeCamera,
+      flashMode,
+      zoom,
+      exposure,
+      image,
+      xPoint,
+      yPoint,
+      permission,
+    } = this.state;
+    const {width, height, saveText, sendText, colorScheme, theme} = this.props;
+    const {textLibrary} = theme;
     if (!open) {
       return null;
     }
-    const {width, height, saveText, sendText} = this.props;
+    if (permission === RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
+      const colorIcon = colorScheme === 'light' ? '#000' : '#fff';
+      const colorSetting =
+        colorScheme === 'light' ? backgroundIconChat : backgroundIconChatDark;
+      return (
+        <BlurView blurType={colorScheme} style={styles.blurViewAuth}>
+          <Pressable onPress={this.close} style={styles.iconClose}>
+            <IconIon name="ios-close" size={30} color={colorIcon} />
+          </Pressable>
+          <View>
+            <Text style={styles.textPermission}>
+              {textLibrary?.CameraPermission}
+            </Text>
+            <Text style={styles.textPermissionDescription}>
+              {textLibrary?.CameraPermissionDescription}
+            </Text>
+            <Pressable
+              style={styles.openSetting}
+              onPress={() => Linking.openSettings()}>
+              <Text style={[styles.textOpenSeting, {color: colorSetting}]}>
+                {textLibrary?.openSettingApp}
+              </Text>
+            </Pressable>
+          </View>
+        </BlurView>
+      );
+    }
     if (image) {
       return (
         <Suspense fallback={null}>
@@ -194,6 +235,7 @@ class Camera extends Component<
         onDoubleTab={this.handleChangeType}
         onTab={this.handlePress}>
         <RNCamera
+          onStatusChange={this.handleStatusCamera}
           useNativeZoom
           exposure={exposure}
           zoom={zoom}
@@ -231,6 +273,49 @@ const SwapCamera = React.forwardRef((props: ICameraProps, ref: any) => {
   return (
     <Camera {...props} {...value} ref={ref} toggleCamera={value.toggleCamera} />
   );
+});
+
+const styles = StyleSheet.create({
+  blurViewAuth: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+  },
+  textPermission: {
+    fontWeight: '600',
+    textAlign: 'center',
+    fontSize: 16,
+    lineHeight: 19,
+  },
+  textPermissionDescription: {
+    textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 19,
+    fontSize: 13,
+    paddingHorizontal: 10,
+    fontWeight: '400',
+  },
+  openSetting: {
+    marginTop: 25,
+  },
+  textOpenSeting: {
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  iconClose: {
+    position: 'absolute',
+    top: bar.isTouch ? bar.topHeight : 10,
+    left: 15,
+    zIndex: 1000,
+    width: 30,
+    height: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2.5,
+  },
 });
 
 export default SwapCamera;

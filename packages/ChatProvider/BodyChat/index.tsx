@@ -1,5 +1,4 @@
 import ViewKeyboard from '@/ChatProvider/ViewKeyboard';
-import bar from '@/utils/bar';
 import React, {Component} from 'react';
 import {
   ImageBackground,

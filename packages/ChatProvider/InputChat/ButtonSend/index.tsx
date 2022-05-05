@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     width: 50,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     position: 'relative',
   },
   image: {

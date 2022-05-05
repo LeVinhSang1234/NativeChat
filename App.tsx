@@ -5,7 +5,7 @@ import ChatProvider from './packages/ChatProvider';
 const App = () => {
   return (
     <ChatProvider>
-      <Chat />
+      <Chat user={{_id: 1}} />
     </ChatProvider>
   );
 };

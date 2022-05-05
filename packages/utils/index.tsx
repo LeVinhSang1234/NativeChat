@@ -16,7 +16,7 @@ export {
   MaterialIcons,
   IconSomeWherePro,
   IconEvilIcons,
-  OcticonsIcon
+  OcticonsIcon,
 };
 
 export const appConnect: {language: string} = {
