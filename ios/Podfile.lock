@@ -368,8 +368,6 @@ PODS:
     - React
   - RNDeviceInfo (8.7.0):
     - React-Core
-  - RNI18n (2.0.15):
-    - React
   - RNVectorIcons (9.1.0):
     - React-Core
   - SocketRocket (0.6.0)
@@ -438,7 +436,6 @@ DEPENDENCIES:
   - rn-photos-framework (from `../node_modules/rn-photos-framework`)
   - RNConvertPhAsset (from `../node_modules/react-native-convert-ph-asset`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
-  - RNI18n (from `../node_modules/react-native-i18n`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -533,8 +530,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-convert-ph-asset"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
-  RNI18n:
-    :path: "../node_modules/react-native-i18n"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   Yoga:
@@ -590,7 +585,6 @@ SPEC CHECKSUMS:
   rn-photos-framework: be55348215a70cf9a7ecbd77802d6750b58662de
   RNConvertPhAsset: 9b366b8a1abc194b76572712c6f7dd89c9e4e37f
   RNDeviceInfo: 36286df381fcaf1933ff9d2d3c34ba2abeb2d8d8
-  RNI18n: e2f7e76389fcc6e84f2c8733ea89b92502351fd8
   RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 17cd9a50243093b547c1e539c749928dd68152da
