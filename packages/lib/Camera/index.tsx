@@ -1,4 +1,8 @@
-import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
+import {
+  IProviderChat,
+  ProviderChat,
+  useProviderChat,
+} from '@/ChatProvider/Provider';
 import {IconIon, throwException} from '@/utils';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component, ReactNode, Suspense} from 'react';
@@ -21,11 +25,11 @@ import bar from '@/utils/bar';
 
 const ImageCapture = React.lazy(() => import('./ImageCapture'));
 
-interface ICameraProps {
+export declare type ICameraProps = {
   saveText?: string;
   sendText?: string;
   defaultOpen?: boolean;
-}
+};
 
 interface IState {
   open: boolean;
@@ -69,8 +73,6 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
 
   close = () => {
     StatusBar.setHidden(false);
-    const {toggleCamera} = this.props;
-    toggleCamera?.(false);
     this.setState({open: false, zoom: 0, image: undefined});
   };
 
@@ -197,26 +199,36 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
       const colorSetting =
         colorScheme === 'light' ? backgroundIconChat : backgroundIconChatDark;
       return (
-        <BlurView blurType={colorScheme} style={styles.blurViewAuth}>
-          <Pressable onPress={this.close} style={styles.iconClose}>
-            <IconIon name="ios-close" size={30} color={colorIcon} />
-          </Pressable>
-          <View>
-            <Text style={styles.textPermission}>
-              {textLibrary?.CameraPermission}
-            </Text>
-            <Text style={styles.textPermissionDescription}>
-              {textLibrary?.CameraPermissionDescription}
-            </Text>
-            <Pressable
-              style={styles.openSetting}
-              onPress={() => Linking.openSettings()}>
-              <Text style={[styles.textOpenSeting, {color: colorSetting}]}>
-                {textLibrary?.openSettingApp}
-              </Text>
-            </Pressable>
-          </View>
-        </BlurView>
+        <ProviderChat.Consumer>
+          {({toggleCamera}) => (
+            <BlurView blurType={colorScheme} style={styles.blurViewAuth}>
+              <Pressable
+                onPress={() => {
+                  this.close();
+                  console.log(toggleCamera);
+                  toggleCamera(false);
+                }}
+                style={styles.iconClose}>
+                <IconIon name="ios-close" size={30} color={colorIcon} />
+              </Pressable>
+              <View>
+                <Text style={styles.textPermission}>
+                  {textLibrary?.CameraPermission}
+                </Text>
+                <Text style={styles.textPermissionDescription}>
+                  {textLibrary?.CameraPermissionDescription}
+                </Text>
+                <Pressable
+                  style={styles.openSetting}
+                  onPress={() => Linking.openSettings()}>
+                  <Text style={[styles.textOpenSeting, {color: colorSetting}]}>
+                    {textLibrary?.openSettingApp}
+                  </Text>
+                </Pressable>
+              </View>
+            </BlurView>
+          )}
+        </ProviderChat.Consumer>
       );
     }
     if (image) {

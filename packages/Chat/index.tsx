@@ -1,82 +1,77 @@
-import BodyChat from '@/ChatProvider/BodyChat';
+import {theme} from '@/ChatProvider/theme';
 import Text from '@/lib/Text';
-import React, {Component, Fragment} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {Component} from 'react';
+import {
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
-export interface IChatProps {
-  keyboardDistance?: number;
-  inputToolbar?: any;
+export declare type IChatProps = {
   user: {
     _id: string | number;
-    id?: string | number;
     url_avatar?: string;
   };
   avatar_url_failback?: string;
-}
+};
 
 class Chat extends Component<IChatProps> {
   render() {
-    const {keyboardDistance, inputToolbar} = this.props;
     return (
-      <Fragment>
-        <View style={styles.view}>
-          <BodyChat
-            scrollEndFirst
-            inputToolbar={inputToolbar}
-            keyboardDistance={keyboardDistance}>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <Text>sang</Text>
-            <View style={{backgroundColor: 'red'}}>
+      <View style={styles.view}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentStyle}>
+          <Pressable style={styles.contentPress}>
+            <ImageBackground
+              source={{uri: theme.chatBody?.imageBackground?.uri}}
+              style={{
+                backgroundColor: theme.chatBody?.backgroundColor,
+              }}>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
+              <Text>sang</Text>
               <Text>end</Text>
-            </View>
-          </BodyChat>
-        </View>
-      </Fragment>
+            </ImageBackground>
+          </Pressable>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -84,6 +79,18 @@ class Chat extends Component<IChatProps> {
 const styles = StyleSheet.create({
   view: {
     flex: 1,
+    transform: [{scaleY: -1}],
+  },
+  scrollView: {
+    flex: 1,
+    overflow: 'visible',
+  },
+  contentPress: {
+    transform: [{scaleY: -1}],
+  },
+  contentStyle: {
+    flexGrow: 1,
+    justifyContent: 'flex-end',
   },
 });
 

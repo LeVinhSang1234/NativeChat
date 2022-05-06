@@ -19,10 +19,6 @@ export {
   OcticonsIcon,
 };
 
-export const appConnect: {language: string} = {
-  language: '',
-};
-
 export async function throwException(e: any) {
   console.log(e);
 }
@@ -45,43 +41,4 @@ export function animatedSpringLayout(
     overshootClamping: true,
     useNativeDriver: !!nativeDriver,
   });
-}
-
-export function animatedSpring(
-  animated: any,
-  value: any,
-  nativeDriver?: boolean,
-) {
-  return Animated.spring(animated, {
-    toValue: value,
-    useNativeDriver: !!nativeDriver,
-  });
-}
-
-export function animatedTiming(
-  animated: any,
-  {
-    toValue = 0,
-    duration = 0,
-    nativeDrive = false,
-    easing,
-    delay = 0,
-  }: {
-    toValue: any;
-    duration?: number;
-    nativeDrive?: boolean;
-    easing?: any;
-    delay?: number;
-  },
-) {
-  const objectConfig: any = {
-    toValue,
-    useNativeDriver: nativeDrive,
-    duration,
-    delay,
-  };
-  if (easing) {
-    objectConfig.easing = easing;
-  }
-  return Animated.timing(animated, objectConfig);
 }

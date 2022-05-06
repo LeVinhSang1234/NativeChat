@@ -1,5 +1,5 @@
 import {ProviderChat} from '@/ChatProvider/Provider';
-import {animatedTiming, IconIon} from '@/utils';
+import {IconIon} from '@/utils';
 import React, {Component} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 
@@ -48,25 +48,25 @@ class FocusPoint extends Component<IProps> {
   };
 
   handleAnimatedShow = () => {
-    animatedTiming(this.animatedLine, {
+    Animated.timing(this.animatedLine, {
       toValue: 1,
       duration: 100,
-      nativeDrive: true,
+      useNativeDriver: true,
     }).start();
   };
 
   handleAnimatedLineShow = () => {
     this.animatedScale.setValue(1);
     Animated.parallel([
-      animatedTiming(this.animatedView, {
+      Animated.timing(this.animatedView, {
         toValue: 1,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
-      animatedTiming(this.animatedLine, {
+      Animated.timing(this.animatedLine, {
         toValue: 1,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
     ]).start(({finished: f}) => {
       if (f) {
@@ -78,15 +78,15 @@ class FocusPoint extends Component<IProps> {
   handleAnimatedViewShow = () => {
     this.animatedScale.setValue(1.6);
     Animated.parallel([
-      animatedTiming(this.animatedView, {
+      Animated.timing(this.animatedView, {
         toValue: 1,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
-      animatedTiming(this.animatedScale, {
+      Animated.timing(this.animatedScale, {
         toValue: 1,
         duration: 100,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
     ]).start(({finished: f}) => {
       if (f) {
@@ -96,11 +96,11 @@ class FocusPoint extends Component<IProps> {
   };
 
   handleAnimatedViewShowDown = () => {
-    animatedTiming(this.animatedView, {
+    Animated.timing(this.animatedView, {
       toValue: 0.3,
       duration: 100,
       delay: 4000,
-      nativeDrive: true,
+      useNativeDriver: true,
     }).start(({finished}) => {
       if (finished) {
         this.handleAnimatedViewHide();
@@ -110,42 +110,42 @@ class FocusPoint extends Component<IProps> {
 
   handleAnimatedViewHide = () => {
     Animated.parallel([
-      animatedTiming(this.animatedView, {
+      Animated.timing(this.animatedView, {
         toValue: 0,
         duration: 0,
         delay: 4000,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
-      animatedTiming(this.animatedScale, {
+      Animated.timing(this.animatedScale, {
         toValue: 1.6,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
         delay: 4000,
       }),
-      animatedTiming(this.animatedLine, {
+      Animated.timing(this.animatedLine, {
         toValue: 0,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
     ]).start();
   };
 
   handleAnimatedViewHideNow = (callback: () => any) => {
     Animated.parallel([
-      animatedTiming(this.animatedView, {
+      Animated.timing(this.animatedView, {
         toValue: 0,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
-      animatedTiming(this.animatedScale, {
+      Animated.timing(this.animatedScale, {
         toValue: 1.6,
         duration: 0,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
-      animatedTiming(this.animatedLine, {
+      Animated.timing(this.animatedLine, {
         toValue: 0,
         duration: 100,
-        nativeDrive: true,
+        useNativeDriver: true,
       }),
     ]).start(({finished}) => {
       if (finished) {
