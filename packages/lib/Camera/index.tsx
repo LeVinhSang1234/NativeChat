@@ -205,7 +205,6 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
               <Pressable
                 onPress={() => {
                   this.close();
-                  console.log(toggleCamera);
                   toggleCamera(false);
                 }}
                 style={styles.iconClose}>

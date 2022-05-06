@@ -8,12 +8,14 @@ export declare type IProviderChat = {
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
+  toggleKeyboard: (_h: number) => any;
 };
 
 const initValue: IProviderChat = {
   width: Dimensions.get('screen').width,
   height: Dimensions.get('screen').height,
   toggleCamera: (_flag: boolean) => null,
+  toggleKeyboard: (_h: number) => null,
   theme,
   colorScheme: 'light',
 };

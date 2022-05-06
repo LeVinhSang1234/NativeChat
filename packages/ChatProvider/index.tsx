@@ -1,4 +1,6 @@
+import InputChat from '@/Chat/InputChat';
 import ModalCamera from '@/Chat/ModalCamera';
+import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
 import {View, StyleSheet, Dimensions, useColorScheme} from 'react-native';
 import {ProviderChat} from './Provider';
@@ -22,6 +24,7 @@ interface IPropsChatSwap extends IChatProviderProps {
 class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   timeout?: NodeJS.Timeout;
   modalCamera?: ModalCamera | null;
+  viewKeyboard?: ViewKeyboard | null;
   constructor(props: IPropsChatSwap) {
     super(props);
     this.state = {
@@ -41,6 +44,10 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     this.modalCamera?.toggleVisible?.(flag);
   };
 
+  toggleKeyboard = (height: number) => {
+    this.viewKeyboard?.toggleKeyboard?.(height);
+  };
+
   render() {
     const {children, colorScheme, keyboardDistance} = this.props;
     const {loading, width, height} = this.state;
@@ -50,13 +57,22 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
           width,
           height,
           toggleCamera: this.toggleCamera,
+          toggleKeyboard: this.toggleKeyboard,
           theme,
           colorScheme,
         }}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
         </View>
-        <ViewKeyboard keyboardDistance={keyboardDistance} />
+        <BlurView blurType={colorScheme}>
+          <InputChat />
+          <ViewKeyboard
+            ref={ref => {
+              this.viewKeyboard = ref;
+            }}
+            keyboardDistance={keyboardDistance}
+          />
+        </BlurView>
         <ModalCamera ref={ref => (this.modalCamera = ref)} />
       </ProviderChat.Provider>
     );
