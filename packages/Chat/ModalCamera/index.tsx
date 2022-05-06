@@ -10,7 +10,7 @@ interface IModalState {
 class ModalCamera extends Component<IModalProps, IModalState> {
   constructor(props: IModalProps) {
     super(props);
-    this.state = {isCamera: true};
+    this.state = {isCamera: false};
   }
 
   shouldComponentUpdate(_: IModalProps, nState: IModalState) {

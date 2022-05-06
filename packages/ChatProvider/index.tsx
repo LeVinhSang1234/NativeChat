@@ -1,16 +1,13 @@
 import ModalCamera from '@/Chat/ModalCamera';
 import React, {Component} from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  LayoutChangeEvent,
-  useColorScheme,
-} from 'react-native';
+import {View, StyleSheet, Dimensions, useColorScheme} from 'react-native';
 import {ProviderChat} from './Provider';
 import {theme} from './theme';
+import ViewKeyboard from './ViewKeyboard';
 
-export interface IChatProviderProps {}
+export declare type IChatProviderProps = {
+  keyboardDistance?: number;
+};
 
 interface IState {
   loading: boolean;
@@ -34,7 +31,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     };
   }
 
-  handleLayout = ({nativeEvent}: LayoutChangeEvent) => {
+  handleLayout = ({nativeEvent}: any) => {
     const {layout} = nativeEvent;
     const {height, width} = layout;
     this.setState({height, width, loading: false});
@@ -45,7 +42,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   };
 
   render() {
-    const {children, colorScheme} = this.props;
+    const {children, colorScheme, keyboardDistance} = this.props;
     const {loading, width, height} = this.state;
     return (
       <ProviderChat.Provider
@@ -59,6 +56,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
         </View>
+        <ViewKeyboard keyboardDistance={keyboardDistance} />
         <ModalCamera ref={ref => (this.modalCamera = ref)} />
       </ProviderChat.Provider>
     );

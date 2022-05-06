@@ -1,12 +1,15 @@
-import {animatedSpringLayout} from '@/utils';
 import bar from '@/utils/bar';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
-import {Animated, Keyboard, KeyboardEvent, StyleSheet} from 'react-native';
+import {
+  KeyboardEvent,
+  LayoutAnimation,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {KeyboardListener} from '..';
 import {ProviderChat} from './Provider';
-
-const BlurAnimated: any = Animated.createAnimatedComponent(BlurView);
 
 interface IViewKeyboardProps {
   backgroundColor?: string;
@@ -16,71 +19,62 @@ interface IViewKeyboardProps {
 
 interface ISwapView extends IViewKeyboardProps {}
 
-class ViewKeyboard extends Component<ISwapView> {
-  animatedView: Animated.Value | any;
+interface IState {
+  height: number;
+}
+class ViewKeyboard extends Component<ISwapView, IState> {
   initApp: any;
   constructor(props: ISwapView) {
     super(props);
-    this.animatedView = new Animated.Value(bar.bottomHeight);
+    this.state = {height: bar.bottomHeight};
   }
 
-  shouldComponentUpdate(nProps: ISwapView) {
+  shouldComponentUpdate(nProps: ISwapView, nState: IState) {
     const {keyboardDistance, backgroundColor} = this.props;
+    const {height} = this.state;
     return (
       backgroundColor !== nProps.backgroundColor ||
+      height !== nState.height ||
       keyboardDistance !== nProps.keyboardDistance
     );
   }
 
   onWillShow = (event: KeyboardEvent) => {
-    const {endCoordinates} = event;
-    const {keyboardDistance = 0} = this.props;
-    animatedSpringLayout(
-      this.animatedView,
-      endCoordinates.height - keyboardDistance,
-    ).start();
-  };
-
-  onWillHide = () => {
-    animatedSpringLayout(this.animatedView, bar.bottomHeight).start();
-  };
-
-  isKeyboardOpen = (): {isOpen: boolean; height: number} => {
-    return {
-      isOpen: this.animatedView._value > 34,
-      height: this.animatedView._value,
-    };
-  };
-
-  toggleImage = (height: number, callback?: () => any) => {
-    Keyboard.dismiss();
-    if (height === 0 || height < 0) {
-      animatedSpringLayout(this.animatedView, bar.bottomHeight).start();
-    } else {
-      const {keyboardDistance = 0} = this.props;
-      animatedSpringLayout(
-        this.animatedView,
-        height - keyboardDistance,
-      ).start();
+    const {endCoordinates, duration, easing} = event;
+    if (Platform.OS === 'ios') {
+      LayoutAnimation.configureNext(
+        LayoutAnimation.create(duration, easing, 'opacity'),
+      );
     }
-    callback?.();
+    this.setState({height: endCoordinates.height});
+  };
+
+  onWillHide = (event: KeyboardEvent) => {
+    const {duration, easing} = event;
+    this.setState({height: bar.bottomHeight});
+    if (Platform.OS === 'ios') {
+      LayoutAnimation.configureNext(
+        LayoutAnimation.create(duration, easing, 'opacity'),
+      );
+    }
   };
 
   render() {
     const {backgroundColor} = this.props;
+    const {height} = this.state;
     return (
       <ProviderChat.Consumer>
         {({width, colorScheme}) => (
-          <BlurAnimated
+          <BlurView
             blurType={colorScheme}
             style={[styles.view, {backgroundColor}]}>
-            <Animated.View style={{height: this.animatedView, width}}>
+            <View style={{height, width}}>
               <KeyboardListener
                 onWillShow={this.onWillShow}
                 onWillHide={this.onWillHide}
               />
-            </Animated.View>
-          </BlurAnimated>
+            </View>
+          </BlurView>
         )}
       </ProviderChat.Consumer>
     );
