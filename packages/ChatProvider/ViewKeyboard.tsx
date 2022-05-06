@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import {KeyboardListener} from '..';
+import {ProviderChat} from './Provider';
 interface IViewKeyboardProps {
   backgroundColor?: string;
   keyboardDistance?: number;
@@ -66,17 +67,19 @@ class ViewKeyboard extends Component<ISwapView, IState> {
   };
 
   animatedLayout = (duration: number) => {
-    if (Platform.OS === 'ios') {
-      if (this.animatedBegin) {
-        return;
-      }
-      this.animatedBegin = true;
-      LayoutAnimation.configureNext(
-        LayoutAnimation.create(duration, 'keyboard', 'opacity'),
-        this.removeBeginLayout,
-        this.removeBeginLayout,
-      );
+    if (this.animatedBegin) {
+      return;
     }
+    this.animatedBegin = true;
+    LayoutAnimation.configureNext(
+      LayoutAnimation.create(
+        Platform.OS === 'ios' ? duration : 10,
+        Platform.OS === 'ios' ? 'keyboard' : 'easeOut',
+        'scaleY',
+      ),
+      this.removeBeginLayout,
+      this.removeBeginLayout,
+    );
   };
 
   toggleKeyboard = (h: number = bar.bottomHeight) => {
@@ -96,12 +99,17 @@ class ViewKeyboard extends Component<ISwapView, IState> {
   render() {
     const {height} = this.state;
     return (
-      <View style={[styles.view, {height}]}>
-        <KeyboardListener
-          onWillShow={this.onWillShow}
-          onWillHide={this.onWillHide}
-        />
-      </View>
+      <ProviderChat.Consumer>
+        {({toggleImage}) => (
+          <View style={[styles.view, {height}]}>
+            <KeyboardListener
+              onWillShow={this.onWillShow}
+              onWillHide={this.onWillHide}
+              onDidShow={() => toggleImage(0)}
+            />
+          </View>
+        )}
+      </ProviderChat.Consumer>
     );
   }
 }

@@ -1,4 +1,4 @@
-import {ProviderChat} from '@/ChatProvider/Provider';
+import {IProviderChat, ProviderChat} from '@/ChatProvider/Provider';
 import {theme} from '@/ChatProvider/theme';
 import Text from '@/lib/Text';
 import React, {Component} from 'react';
@@ -27,34 +27,38 @@ class Chat extends Component<IChatProps> {
     this.isMoveScroll = false;
   }
 
-  onMouseMove = ({nativeEvent}: any, height: number, toggleKeyboard: any) => {
+  onMouseMove = ({nativeEvent}: any, value: IProviderChat) => {
+    const {height, toggleKeyboard, toggleImage} = value;
     this.isMoveScroll = true;
     if (height - nativeEvent.pageY <= -30) {
       Keyboard.dismiss();
-      toggleKeyboard?.(0);
+      toggleKeyboard(0);
+      toggleImage(0);
     }
   };
 
-  handlePressScroll = (toggleKeyboard: any) => {
+  handlePressScroll = (value: IProviderChat) => {
+    const {toggleKeyboard, toggleImage} = value;
     Keyboard.dismiss();
-    toggleKeyboard?.(0);
+    toggleKeyboard(0);
+    toggleImage(0);
   };
 
   render() {
     return (
       <ProviderChat.Consumer>
-        {({toggleKeyboard, height}) => (
+        {value => (
           <View style={styles.view} removeClippedSubviews>
             <ScrollView
               removeClippedSubviews
-              onTouchMove={e => this.onMouseMove(e, height, toggleKeyboard)}
+              onTouchMove={e => this.onMouseMove(e, value)}
               style={styles.scrollView}
               onTouchEnd={() => {
                 this.isMoveScroll = false;
               }}
               contentContainerStyle={styles.contentStyle}>
               <Pressable
-                onPress={() => this.handlePressScroll(toggleKeyboard)}
+                onPress={() => this.handlePressScroll(value)}
                 style={styles.contentPress}>
                 <ImageBackground
                   source={{uri: theme.chatBody?.imageBackground?.uri}}

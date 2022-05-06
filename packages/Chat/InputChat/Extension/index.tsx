@@ -30,7 +30,7 @@ class Extension extends Component<IExtensionProps> {
   render() {
     return (
       <ProviderChat.Consumer>
-        {({toggleCamera, toggleKeyboard}) => (
+        {({toggleCamera, toggleKeyboard, toggleImage}) => (
           <View style={[styles.view]}>
             <Pressable
               style={[styles.viewIcon, styles.flexStart]}
@@ -41,6 +41,7 @@ class Extension extends Component<IExtensionProps> {
               style={styles.viewIcon}
               onPress={() => {
                 toggleKeyboard(this.heightKeyboard);
+                toggleImage(this.heightKeyboard);
                 Keyboard.dismiss();
               }}>
               <IconIon style={styles.icon2} name="image" />
