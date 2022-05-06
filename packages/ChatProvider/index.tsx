@@ -1,11 +1,12 @@
 import BottomImage from '@/Chat/BottomImage';
 import InputChat from '@/Chat/InputChat';
 import ModalCamera from '@/Chat/ModalCamera';
+import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
 import {View, StyleSheet, Dimensions, useColorScheme} from 'react-native';
 import {ProviderChat} from './Provider';
-import {theme} from './theme';
+import {ITheme, theme} from './theme';
 import ViewKeyboard from './ViewKeyboard';
 
 export declare type IChatProviderProps = {
@@ -16,6 +17,7 @@ interface IState {
   loading: boolean;
   width: number;
   height: number;
+  theme: ITheme;
 }
 
 interface IPropsChatSwap extends IChatProviderProps {
@@ -27,12 +29,20 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   modalCamera?: ModalCamera | null;
   viewKeyboard?: ViewKeyboard | null;
   bottomImage?: BottomImage | null;
+  styleIcon: ITheme;
   constructor(props: IPropsChatSwap) {
     super(props);
+    const styleIcon = {color: backgroundIconChat};
+    this.styleIcon = {
+      iconCamera: styleIcon,
+      iconMic: styleIcon,
+      iconImage: styleIcon,
+    };
     this.state = {
       loading: true,
       width: Dimensions.get('screen').width,
       height: Dimensions.get('screen').height,
+      theme: this.styleIcon,
     };
   }
 
@@ -51,37 +61,47 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   };
 
   toggleImage = (height: number) => {
+    const {theme: themeState} = this.state;
     this.bottomImage?.toggleImage?.(height);
+    let newTheme = this.styleIcon;
+    if (height) {
+      const style = {color: colorPlaceholder};
+      newTheme = {iconCamera: style, iconMic: style};
+    }
+    this.setState({theme: {...themeState, ...newTheme}});
   };
 
   render() {
     const {children, colorScheme, keyboardDistance} = this.props;
-    const {loading, width, height} = this.state;
+    const {loading, width, height, theme: themeState} = this.state;
+    const provider = {
+      width,
+      height,
+      toggleCamera: this.toggleCamera,
+      toggleImage: this.toggleImage,
+      toggleKeyboard: this.toggleKeyboard,
+      theme: {...theme, ...themeState},
+      colorScheme,
+    };
     return (
-      <ProviderChat.Provider
-        value={{
-          width,
-          height,
-          toggleCamera: this.toggleCamera,
-          toggleImage: this.toggleImage,
-          toggleKeyboard: this.toggleKeyboard,
-          theme,
-          colorScheme,
-        }}>
+      <ProviderChat.Provider value={provider}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
-        </View>
-        <BlurView blurType={colorScheme}>
-          <InputChat />
-          <ViewKeyboard
-            ref={ref => {
-              this.viewKeyboard = ref;
-            }}
-            keyboardDistance={keyboardDistance}
+          <BlurView blurType={colorScheme}>
+            <InputChat />
+            <ViewKeyboard
+              ref={ref => {
+                this.viewKeyboard = ref;
+              }}
+              keyboardDistance={keyboardDistance}
+            />
+          </BlurView>
+          <BottomImage
+            provider={provider}
+            ref={ref => (this.bottomImage = ref)}
           />
-        </BlurView>
-        <BottomImage ref={ref => (this.bottomImage = ref)} />
-        <ModalCamera ref={ref => (this.modalCamera = ref)} />
+          <ModalCamera ref={ref => (this.modalCamera = ref)} />
+        </View>
       </ProviderChat.Provider>
     );
   }

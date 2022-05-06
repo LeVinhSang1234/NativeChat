@@ -43,7 +43,15 @@ class SwapInputChat extends Component<ISwapInputChatProps, IState> {
 
   shouldComponentUpdate(nProps: ISwapInputChatProps) {
     const {provider} = this.props;
-    return provider !== nProps.provider;
+    const {width, height, colorScheme, theme} = provider;
+    const {avoidingView, inputChat} = theme;
+    return (
+      width !== nProps.provider.width ||
+      colorScheme !== nProps.provider.colorScheme ||
+      avoidingView !== nProps.provider.theme?.avoidingView ||
+      inputChat !== nProps.provider.theme?.inputChat ||
+      height !== nProps.provider.height
+    );
   }
 
   handleChangeText = (v: string) => {

@@ -1,7 +1,6 @@
 import {ProviderChat} from '@/ChatProvider/Provider';
 import KeyboardListener from '@/lib/KeyboardListener';
 import {IconIon} from '@/utils';
-import {backgroundIconChat} from '@/utils/variables';
 import React, {Component} from 'react';
 import {
   Animated,
@@ -30,12 +29,12 @@ class Extension extends Component<IExtensionProps> {
   render() {
     return (
       <ProviderChat.Consumer>
-        {({toggleCamera, toggleKeyboard, toggleImage}) => (
+        {({toggleCamera, toggleKeyboard, toggleImage, theme}) => (
           <View style={[styles.view]}>
             <Pressable
               style={[styles.viewIcon, styles.flexStart]}
               onPress={() => toggleCamera(true)}>
-              <IconIon style={styles.icon} name="camera" />
+              <IconIon style={[styles.icon, theme.iconCamera]} name="camera" />
             </Pressable>
             <Pressable
               style={styles.viewIcon}
@@ -44,10 +43,10 @@ class Extension extends Component<IExtensionProps> {
                 toggleImage(this.heightKeyboard);
                 Keyboard.dismiss();
               }}>
-              <IconIon style={styles.icon2} name="image" />
+              <IconIon style={[styles.icon2, theme.iconImage]} name="image" />
             </Pressable>
             <View style={styles.viewIcon}>
-              <IconIon style={styles.icon2} name="mic" />
+              <IconIon style={[styles.icon2, theme.iconMic]} name="mic" />
             </View>
             <KeyboardListener onWillShow={this.onWillShowKeyboard} />
           </View>
@@ -72,12 +71,10 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 31,
-    color: backgroundIconChat,
     marginBottom: -1.8,
   },
   icon2: {
     fontSize: 27,
-    color: backgroundIconChat,
   },
   flexStart: {
     justifyContent: 'flex-start',

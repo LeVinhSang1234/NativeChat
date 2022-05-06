@@ -1,14 +1,21 @@
-import {ProviderChat} from '@/ChatProvider/Provider';
+import {IProviderChat} from '@/ChatProvider/Provider';
 import React, {Component} from 'react';
 import {Animated, Pressable, StyleSheet, View} from 'react-native';
 
-interface IBottomImageProps {}
+interface IBottomImageProps {
+  provider: IProviderChat;
+}
 
 class BottomImage extends Component<IBottomImageProps> {
   animatedHeight: Animated.Value;
   constructor(props: IBottomImageProps) {
     super(props);
     this.animatedHeight = new Animated.Value(0);
+  }
+
+  shouldComponentUpdate(nProps: IBottomImageProps) {
+    const {provider} = this.props;
+    return provider.colorScheme !== nProps.provider.colorScheme;
   }
 
   toggleImage = (h: number = 0) => {
@@ -20,27 +27,23 @@ class BottomImage extends Component<IBottomImageProps> {
   };
 
   render() {
+    const {provider} = this.props;
+    const {colorScheme} = provider;
+    const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
+    const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
     return (
-      <ProviderChat.Consumer>
-        {({colorScheme}) => {
-          const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
-          const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
-          return (
-            <Animated.View
-              style={[
-                styles.view,
-                {shadowColor, backgroundColor, height: this.animatedHeight},
-              ]}>
-              <Pressable
-                // onTouchEnd={() => this.handlePress(toggleKeyboard)}
-                // onTouchMove={e => this.handleTouchMove(e, toggleKeyboard)}
-                style={styles.wrapDrag}>
-                <View style={[styles.lineDrag]} />
-              </Pressable>
-            </Animated.View>
-          );
-        }}
-      </ProviderChat.Consumer>
+      <Animated.View
+        style={[
+          styles.view,
+          {shadowColor, backgroundColor, height: this.animatedHeight},
+        ]}>
+        <Pressable
+          // onTouchEnd={() => this.handlePress(toggleKeyboard)}
+          // onTouchMove={e => this.handleTouchMove(e, toggleKeyboard)}
+          style={styles.wrapDrag}>
+          <View style={[styles.lineDrag]} />
+        </Pressable>
+      </Animated.View>
     );
   }
 }

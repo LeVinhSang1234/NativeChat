@@ -20,6 +20,9 @@ export declare type ITheme = {
     style?: TextStyle;
   };
   avoidingView?: ViewStyle;
+  iconCamera?: TextStyle;
+  iconMic?: TextStyle;
+  iconImage?: TextStyle;
 };
 
 export const theme: ITheme = {
