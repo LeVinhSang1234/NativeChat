@@ -4,13 +4,26 @@ import ModalCamera from '@/Chat/ModalCamera';
 import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
-import {View, StyleSheet, Dimensions, useColorScheme} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  useColorScheme,
+  LogBox,
+} from 'react-native';
 import {ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
 import ViewKeyboard from './ViewKeyboard';
 
+LogBox.ignoreLogs([
+  'ViewPropTypes will be removed',
+  'ColorPropType will be removed',
+  'Overriding previous layout animation',
+]);
+
 export declare type IChatProviderProps = {
   keyboardDistance?: number;
+  children?: any;
 };
 
 interface IState {
@@ -18,6 +31,7 @@ interface IState {
   width: number;
   height: number;
   theme: ITheme;
+  heightKeyboard: number;
 }
 
 interface IPropsChatSwap extends IChatProviderProps {
@@ -43,6 +57,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       width: Dimensions.get('screen').width,
       height: Dimensions.get('screen').height,
       theme: this.styleIcon,
+      heightKeyboard: 0,
     };
   }
 
@@ -58,6 +73,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
 
   toggleKeyboard = (height: number) => {
     this.viewKeyboard?.toggleKeyboard?.(height);
+    this.setState({heightKeyboard: height});
   };
 
   toggleImage = (height: number) => {
@@ -73,7 +89,13 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
 
   render() {
     const {children, colorScheme, keyboardDistance} = this.props;
-    const {loading, width, height, theme: themeState} = this.state;
+    const {
+      loading,
+      width,
+      height,
+      theme: themeState,
+      heightKeyboard,
+    } = this.state;
     const provider = {
       width,
       height,
@@ -82,6 +104,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       toggleKeyboard: this.toggleKeyboard,
       theme: {...theme, ...themeState},
       colorScheme,
+      heightKeyboard,
     };
     return (
       <ProviderChat.Provider value={provider}>

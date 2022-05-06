@@ -35,6 +35,10 @@ class ViewKeyboard extends Component<ISwapView, IState> {
     this.unsubHideKeyboard = false;
   }
 
+  componentWillUnmount() {
+    this.setState = () => null;
+  }
+
   shouldComponentUpdate(nProps: ISwapView, nState: IState) {
     const {keyboardDistance, backgroundColor} = this.props;
     const {height} = this.state;

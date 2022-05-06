@@ -29,14 +29,17 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
 
   shouldComponentUpdate(nProps: IChatProps & {provider: IProviderChat}) {
     const {provider} = this.props;
-    return provider.height !== nProps.provider.height;
+    return (
+      provider.height !== nProps.provider.height ||
+      provider.heightKeyboard !== nProps.provider.heightKeyboard
+    );
   }
 
   onMouseMove = ({nativeEvent}: any) => {
     const {provider} = this.props;
-    const {height, toggleKeyboard, toggleImage} = provider;
+    const {height, toggleKeyboard, toggleImage, heightKeyboard} = provider;
     this.isMoveScroll = true;
-    if (height - nativeEvent.pageY <= -30) {
+    if (heightKeyboard && height - nativeEvent.pageY <= heightKeyboard + 20) {
       Keyboard.dismiss();
       toggleKeyboard(0);
       toggleImage(0);
@@ -45,10 +48,12 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
 
   handlePressScroll = () => {
     const {provider} = this.props;
-    const {toggleKeyboard, toggleImage} = provider;
-    Keyboard.dismiss();
-    toggleKeyboard(0);
-    toggleImage(0);
+    const {toggleKeyboard, toggleImage, heightKeyboard} = provider;
+    if (heightKeyboard) {
+      Keyboard.dismiss();
+      toggleKeyboard(0);
+      toggleImage(0);
+    }
   };
 
   render() {

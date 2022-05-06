@@ -5,6 +5,7 @@ import {ITheme, theme} from './theme';
 export declare type IProviderChat = {
   width: number;
   height: number;
+  heightKeyboard: number;
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
@@ -15,6 +16,7 @@ export declare type IProviderChat = {
 const initValue: IProviderChat = {
   width: Dimensions.get('screen').width,
   height: Dimensions.get('screen').height,
+  heightKeyboard: 0,
   toggleCamera: (_flag: boolean) => null,
   toggleKeyboard: (_h: number) => null,
   toggleImage: (_h: number) => null,
