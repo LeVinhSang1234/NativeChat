@@ -75,7 +75,7 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
               style={{
                 backgroundColor: theme.chatBody?.backgroundColor,
               }}>
-              <Text>sang</Text>
+              <Text>sangsangsangsangsangsangsangsangsangsangsangsang</Text>
             </ImageBackground>
           </Pressable>
         </ScrollView>
