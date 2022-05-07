@@ -1,4 +1,5 @@
-import BottomImage from '@/Chat/BottomImage';
+import BottomDrag from '@/Chat/BottomDrag';
+import HeaderSelectImage from '@/Chat/HeaderSelectImage';
 import InputChat from '@/Chat/InputChat';
 import ModalCamera from '@/Chat/ModalCamera';
 import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
@@ -42,7 +43,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   timeout?: NodeJS.Timeout;
   modalCamera?: ModalCamera | null;
   viewKeyboard?: ViewKeyboard | null;
-  bottomImage?: BottomImage | null;
+  bottomImage?: BottomDrag | null;
   styleIcon: ITheme;
   constructor(props: IPropsChatSwap) {
     super(props);
@@ -119,7 +120,8 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
               keyboardDistance={keyboardDistance}
             />
           </BlurView>
-          <BottomImage
+          <BottomDrag
+            Header={HeaderSelectImage}
             provider={provider}
             ref={ref => (this.bottomImage = ref)}
           />

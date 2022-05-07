@@ -1,4 +1,8 @@
-import {backgroundChatDark, backgroundChatLight} from '@/utils/variables';
+import {
+  backgroundChatDark,
+  backgroundChatLight,
+  backgroundIconChat,
+} from '@/utils/variables';
 import {TextStyle, ViewStyle} from 'react-native';
 
 export declare type ITheme = {
@@ -23,6 +27,28 @@ export declare type ITheme = {
   iconCamera?: TextStyle;
   iconMic?: TextStyle;
   iconImage?: TextStyle;
+  bottomImage?: {
+    header: {
+      style?: ViewStyle;
+      button?: {
+        cancel?: {
+          style?: TextStyle;
+          text?: string;
+          pressable?: ViewStyle;
+        };
+        album?: {
+          style?: TextStyle;
+          text?: string;
+          pressable?: ViewStyle;
+        };
+        middleAlbum?: {
+          album?: TextStyle;
+          albumDescription?: TextStyle;
+          pressable?: ViewStyle;
+        };
+      };
+    };
+  };
 };
 
 export const theme: ITheme = {
@@ -57,5 +83,35 @@ export const theme: ITheme = {
     paddingBottom: 10,
     paddingTop: 10,
     paddingHorizontal: 10,
+  },
+  bottomImage: {
+    header: {
+      style: {
+        height: 30,
+      },
+      button: {
+        cancel: {
+          style: {color: backgroundIconChat, fontWeight: '600'},
+          pressable: {
+            width: 70,
+            height: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft: 10,
+          },
+        },
+        album: {
+          style: {color: backgroundIconChat, fontWeight: '600'},
+          pressable: {
+            width: 70,
+            height: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            paddingRight: 10,
+          },
+        },
+      },
+    },
   },
 };

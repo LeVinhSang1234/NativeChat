@@ -2,6 +2,7 @@ import {IProviderChat} from '@/ChatProvider/Provider';
 import bar from '@/utils/bar';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component, Fragment} from 'react';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {
   Animated,
   Easing,
@@ -13,13 +14,19 @@ import {
   View,
 } from 'react-native';
 
+const options = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
+
 const AnimatedBlur = Animated.createAnimatedComponent(BlurView);
 
-interface IBottomImageProps {
+export declare type IBottomImageProps = {
   provider: IProviderChat;
-}
+  Header?: any;
+};
 
-class BottomImage extends Component<IBottomImageProps> {
+class BottomDrag extends Component<IBottomImageProps> {
   animatedHeight: Animated.Value | any;
   pageY: number;
   pageYStart: number;
@@ -37,21 +44,21 @@ class BottomImage extends Component<IBottomImageProps> {
   }
 
   shouldComponentUpdate(nProps: IBottomImageProps) {
-    const {provider} = this.props;
-    return provider.colorScheme !== nProps.provider.colorScheme;
+    const {provider, Header} = this.props;
+    const {theme} = provider;
+    return (
+      provider.colorScheme !== nProps.provider.colorScheme ||
+      theme.bottomImage?.header !== nProps.provider.theme.bottomImage?.header ||
+      Header !== nProps.Header
+    );
   }
 
   toggleImage = (h: number = 0) => {
-    const {provider} = this.props;
-    const {toggleKeyboard} = provider;
     Animated.timing(this.animatedHeight, {
       toValue: h,
       duration: 0,
       useNativeDriver: false,
     }).start();
-    if (this.heightKeyboard && h <= this.heightKeyboard) {
-      toggleKeyboard(h);
-    }
   };
 
   handleTouchStart = ({nativeEvent}: GestureResponderEvent) => {
@@ -63,14 +70,17 @@ class BottomImage extends Component<IBottomImageProps> {
   };
 
   handleTouchMove = ({nativeEvent}: GestureResponderEvent) => {
+    if (this.pageYStart <= 0) {
+      return;
+    }
     const valueChange = this.pageY - nativeEvent.pageY;
-    this.isMoveUp = valueChange > 0;
+    this.isMoveUp = valueChange >= 0;
     if (Math.abs(nativeEvent.pageY - this.pageYStart) > 10) {
       const {provider} = this.props;
       let opacity =
-        (this.animatedHeight._value + valueChange) /
-        (provider.height - bar.bottomHeight);
-      if (opacity < 0.2) {
+        (this.animatedHeight._value + valueChange - this.heightKeyboard) /
+        provider.height;
+      if (opacity < 0) {
         opacity = 0;
       }
       let valueNext = this.animatedHeight._value + valueChange;
@@ -83,61 +93,81 @@ class BottomImage extends Component<IBottomImageProps> {
         this.handleAnimatedBackdrop(0);
       }
       this.toggleImage(valueNext);
+      if (valueNext < this.heightKeyboard) {
+        provider.toggleKeyboard(valueNext);
+      }
       this.pageY = nativeEvent.pageY;
     }
   };
 
   handleTouchEnd = () => {
-    const {provider} = this.props;
-    const {height, toggleImage} = provider;
+    if (this.pageYStart <= 0) {
+      return;
+    }
     this.pageYStart = 0;
     this.pageY = 0;
-    if (this.isMoveUp) {
-      if (this.animatedHeight._value < this.heightKeyboard) {
-        toggleImage(this.heightKeyboard);
-        this.handleAnimatedBackdrop(0.8);
-      } else if (this.animatedHeight._value <= height - bar.topHeight) {
-        toggleImage(height - bar.topHeight);
-        this.handleAnimatedBackdrop(0.8);
+    this.handleCheckValue(!this.isMoveUp);
+    this.animatedLayout();
+  };
+
+  handleCheckValue = (down: boolean) => {
+    const {provider} = this.props;
+    const {height, toggleImage} = provider;
+    if (this.animatedHeight._value < this.heightKeyboard) {
+      toggleImage(down ? 0 : this.heightKeyboard);
+      provider.toggleKeyboard(down ? 0 : this.heightKeyboard);
+      this.handleAnimatedBackdrop(0);
+    } else if (this.animatedHeight._value <= height - bar.topHeight) {
+      toggleImage(down ? this.heightKeyboard : height - bar.topHeight);
+      if (!down) {
+        ReactNativeHapticFeedback.trigger('impactHeavy', options);
       }
-    } else {
-      if (this.animatedHeight._value < this.heightKeyboard) {
-        this.handleAnimatedBackdrop(0);
-        this.heightKeyboard = 0;
-        toggleImage(0);
-      } else if (this.animatedHeight._value <= height - bar.topHeight) {
-        toggleImage(this.heightKeyboard);
-        this.handleAnimatedBackdrop(0);
-        this.heightKeyboard = 0;
-      }
+      this.handleAnimatedBackdrop(down ? 0 : 0.6, 100);
     }
+    if (down) {
+      this.heightKeyboard = 0;
+    }
+  };
+
+  handleToggleClose = (v: number) => {
+    const {provider} = this.props;
+    const {toggleImage} = provider;
+    toggleImage(v);
+    this.handleAnimatedBackdrop(0);
+    this.animatedLayout();
+  };
+
+  animatedLayout = () => {
     LayoutAnimation.configureNext(
       LayoutAnimation.create(
-        250,
+        100,
         Platform.OS === 'ios' ? 'keyboard' : 'easeOut',
         'scaleY',
       ),
     );
   };
 
-  handleAnimatedBackdrop = (value: number) => {
+  handleAnimatedBackdrop = (value: number, duration: number = 50) => {
     Animated.timing(this.animatedBackdrop, {
       toValue: value,
-      duration: 50,
+      duration,
       useNativeDriver: false,
       easing: Easing.ease,
     }).start();
   };
 
   render() {
-    const {provider} = this.props;
+    const {provider, Header} = this.props;
     const {colorScheme, height} = provider;
     const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
     const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
-
     const heightBackdrop = this.animatedBackdrop.interpolate({
-      inputRange: [0, 0.001],
+      inputRange: [0, 0.01],
       outputRange: [0, height],
+    });
+    const borderRadius = this.animatedBackdrop.interpolate({
+      inputRange: [0, 0.6],
+      outputRange: [8, 12],
     });
 
     return (
@@ -147,20 +177,36 @@ class BottomImage extends Component<IBottomImageProps> {
           blurAmount={100}
           style={[
             styles.viewBackdrop,
-            {opacity: this.animatedBackdrop, height: heightBackdrop},
+            {
+              opacity: this.animatedBackdrop,
+              height: heightBackdrop,
+              backgroundColor: shadowColor,
+            },
           ]}
         />
         <Animated.View
           style={[
             styles.view,
-            {shadowColor, backgroundColor, height: this.animatedHeight},
+            {
+              shadowColor,
+              backgroundColor,
+              height: this.animatedHeight,
+              borderTopRightRadius: borderRadius,
+              borderTopLeftRadius: borderRadius,
+            },
           ]}>
           <Pressable
             onPressIn={this.handleTouchStart}
             onTouchMove={this.handleTouchMove}
             onTouchEnd={this.handleTouchEnd}
             style={styles.wrapDrag}>
-            <View style={[styles.lineDrag]} />
+            <View style={styles.center}>
+              <View style={[styles.lineDrag]} />
+            </View>
+            <Header
+              toggleBottom={this.handleToggleClose}
+              animated={this.animatedBackdrop}
+            />
           </Pressable>
         </Animated.View>
       </Fragment>
@@ -180,12 +226,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.215,
     shadowRadius: 3.84,
     elevation: 5,
-    borderTopRightRadius: 8,
-    borderTopLeftRadius: 8,
   },
   wrapDrag: {
-    paddingVertical: 8,
+    paddingVertical: 4,
+    textAlign: 'center',
+  },
+  center: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   lineDrag: {
@@ -198,9 +246,8 @@ const styles = StyleSheet.create({
   viewBackdrop: {
     position: 'absolute',
     bottom: 0,
-    backgroundColor: '#000',
     width: '100%',
   },
 });
 
-export default BottomImage;
+export default BottomDrag;
