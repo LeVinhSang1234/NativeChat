@@ -1,6 +1,5 @@
 import InputChat from '@/Chat/InputChat';
 import ModalCamera from '@/Chat/ModalCamera';
-import ImagePicker from '@/lib/ImagePicker';
 import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
 import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
@@ -43,7 +42,6 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   modalCamera?: ModalCamera | null;
   viewKeyboard?: ViewKeyboard | null;
   styleIcon: ITheme;
-  imagePicker?: ImagePicker | null;
   constructor(props: IPropsChatSwap) {
     super(props);
     const styleIcon = {color: backgroundIconChat};
@@ -78,7 +76,6 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
 
   toggleImage = (height: number) => {
     const {theme: themeState} = this.state;
-    this.imagePicker?.toggleImage?.(height);
     let newTheme = this.styleIcon;
     if (height) {
       const style = {color: colorPlaceholder};
@@ -119,10 +116,6 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
               keyboardDistance={keyboardDistance}
             />
           </BlurView>
-          <ImagePicker
-            ref={ref => (this.imagePicker = ref)}
-            provider={provider}
-          />
           <ModalCamera ref={ref => (this.modalCamera = ref)} />
         </View>
       </ProviderChat.Provider>

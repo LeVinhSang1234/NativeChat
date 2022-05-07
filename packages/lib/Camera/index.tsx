@@ -243,40 +243,47 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
       );
     }
     return (
-      <TabClickHandle
-        onMove={this.handleMove}
-        onDoubleTab={this.handleChangeType}
-        onTab={this.handlePress}>
-        <RNCamera
-          onStatusChange={this.handleStatusCamera}
-          useNativeZoom
-          exposure={exposure}
-          zoom={zoom}
-          autoFocus={RNCamera.Constants.AutoFocus.off}
-          autoFocusPointOfInterest={this.renderAutoFocus()}
-          style={{width: width, height: height}}
-          ref={ref => (this.camera = ref)}
-          captureAudio={false}
-          type={typeCamera}
-          flashMode={flashMode}
-          onCameraReady={this.handleReadyCamera}
-        />
-        <ActionTop
-          flashMode={flashMode}
-          onClose={this.close}
-          onChangeFlash={this.handleChangeFlash}
-          onChangeType={this.handleChangeType}
-        />
-        <ActionBottom takePicture={this.takePicture} />
-        <FocusPoint
-          ref={(ref: FocusPoint) => {
-            this.focusPoint = ref;
-          }}
-          exposure={exposure}
-          xPoint={xPoint}
-          yPoint={yPoint}
-        />
-      </TabClickHandle>
+      <ProviderChat.Consumer>
+        {({toggleCamera}) => (
+          <TabClickHandle
+            onMove={this.handleMove}
+            onDoubleTab={this.handleChangeType}
+            onTab={this.handlePress}>
+            <RNCamera
+              onStatusChange={this.handleStatusCamera}
+              useNativeZoom
+              exposure={exposure}
+              zoom={zoom}
+              autoFocus={RNCamera.Constants.AutoFocus.off}
+              autoFocusPointOfInterest={this.renderAutoFocus()}
+              style={{width: width, height: height}}
+              ref={ref => (this.camera = ref)}
+              captureAudio={false}
+              type={typeCamera}
+              flashMode={flashMode}
+              onCameraReady={this.handleReadyCamera}
+            />
+            <ActionTop
+              flashMode={flashMode}
+              onClose={() => {
+                this.close();
+                toggleCamera(false);
+              }}
+              onChangeFlash={this.handleChangeFlash}
+              onChangeType={this.handleChangeType}
+            />
+            <ActionBottom takePicture={this.takePicture} />
+            <FocusPoint
+              ref={(ref: FocusPoint) => {
+                this.focusPoint = ref;
+              }}
+              exposure={exposure}
+              xPoint={xPoint}
+              yPoint={yPoint}
+            />
+          </TabClickHandle>
+        )}
+      </ProviderChat.Consumer>
     );
   }
 }
