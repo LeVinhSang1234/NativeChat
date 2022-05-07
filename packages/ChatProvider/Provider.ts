@@ -13,6 +13,11 @@ export declare type IProviderChat = {
   toggleImage: (_h: number) => any;
 };
 
+export declare type IImagePickerProvider = {
+  album?: any;
+  albums?: any;
+};
+
 const initValue: IProviderChat = {
   width: Dimensions.get('screen').width,
   height: Dimensions.get('screen').height,
@@ -24,8 +29,15 @@ const initValue: IProviderChat = {
   colorScheme: 'light',
 };
 
+const initImagePicker: IImagePickerProvider = {};
+
 export const ProviderChat = createContext(initValue);
+export const ImagePickerProvider = createContext(initImagePicker);
 
 export const useProviderChat = () => {
   return useContext(ProviderChat);
+};
+
+export const useProviderImagePicker = () => {
+  return useContext(ImagePickerProvider);
 };

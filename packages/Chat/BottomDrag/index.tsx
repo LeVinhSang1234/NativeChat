@@ -8,8 +8,11 @@ import {
   Easing,
   GestureResponderEvent,
   LayoutAnimation,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -26,13 +29,17 @@ export declare type IBottomImageProps = {
   Header?: any;
 };
 
-class BottomDrag extends Component<IBottomImageProps> {
+interface IState {}
+
+class BottomDrag extends Component<IBottomImageProps, IState> {
   animatedHeight: Animated.Value | any;
   pageY: number;
   pageYStart: number;
   isMoveUp: boolean;
   heightKeyboard: number;
   animatedBackdrop: Animated.Value;
+  startMove?: number;
+  scrollView?: ScrollView | null;
   constructor(props: IBottomImageProps) {
     super(props);
     this.animatedHeight = new Animated.Value(0);
@@ -40,6 +47,7 @@ class BottomDrag extends Component<IBottomImageProps> {
     this.pageYStart = 0;
     this.pageY = 0;
     this.isMoveUp = false;
+    this.startMove = undefined;
     this.heightKeyboard = 0;
   }
 
@@ -156,8 +164,33 @@ class BottomDrag extends Component<IBottomImageProps> {
     }).start();
   };
 
+  handleTouchMoveScroll = (event: GestureResponderEvent) => {
+    if (this.startMove !== undefined) {
+      if (this.pageYStart === 0) {
+        this.pageYStart = event.nativeEvent.pageY;
+        this.pageY = event.nativeEvent.pageY;
+      }
+      this.handleTouchMove(event);
+      this.scrollView?.scrollTo({y: this.startMove, animated: true});
+    }
+  };
+
+  handleScroll = ({nativeEvent}: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (nativeEvent.contentOffset.y < 0) {
+      this.startMove = 0;
+      if (this.heightKeyboard === 0) {
+        this.heightKeyboard = this.animatedHeight._value;
+      }
+    }
+  };
+
+  handleEndScroll = () => {
+    this.startMove = undefined;
+    this.handleTouchEnd();
+  };
+
   render() {
-    const {provider, Header} = this.props;
+    const {provider, Header, children} = this.props;
     const {colorScheme, height} = provider;
     const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
     const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
@@ -208,6 +241,14 @@ class BottomDrag extends Component<IBottomImageProps> {
               animated={this.animatedBackdrop}
             />
           </Pressable>
+          <ScrollView
+            ref={ref => (this.scrollView = ref)}
+            scrollEventThrottle={16}
+            onScroll={this.handleScroll}
+            onTouchMove={this.handleTouchMoveScroll}
+            onScrollEndDrag={this.handleEndScroll}>
+            {children}
+          </ScrollView>
         </Animated.View>
       </Fragment>
     );
