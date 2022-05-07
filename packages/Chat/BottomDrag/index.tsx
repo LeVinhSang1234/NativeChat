@@ -29,7 +29,9 @@ export declare type IBottomImageProps = {
   Header?: any;
 };
 
-interface IState {}
+interface IState {
+  scrollEventThrottle: number;
+}
 
 class BottomDrag extends Component<IBottomImageProps, IState> {
   animatedHeight: Animated.Value | any;
@@ -49,6 +51,7 @@ class BottomDrag extends Component<IBottomImageProps, IState> {
     this.isMoveUp = false;
     this.startMove = undefined;
     this.heightKeyboard = 0;
+    this.state = {scrollEventThrottle: 2000};
   }
 
   shouldComponentUpdate(nProps: IBottomImageProps) {
@@ -169,6 +172,7 @@ class BottomDrag extends Component<IBottomImageProps, IState> {
       if (this.pageYStart === 0) {
         this.pageYStart = event.nativeEvent.pageY;
         this.pageY = event.nativeEvent.pageY;
+        this.setState({scrollEventThrottle: 16});
       }
       this.handleTouchMove(event);
       this.scrollView?.scrollTo({y: this.startMove, animated: true});
@@ -187,10 +191,12 @@ class BottomDrag extends Component<IBottomImageProps, IState> {
   handleEndScroll = () => {
     this.startMove = undefined;
     this.handleTouchEnd();
+    this.setState({scrollEventThrottle: 2000});
   };
 
   render() {
     const {provider, Header, children} = this.props;
+    const {scrollEventThrottle} = this.state;
     const {colorScheme, height} = provider;
     const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
     const backgroundColor = colorScheme === 'dark' ? '#000' : '#fff';
@@ -243,7 +249,7 @@ class BottomDrag extends Component<IBottomImageProps, IState> {
           </Pressable>
           <ScrollView
             ref={ref => (this.scrollView = ref)}
-            scrollEventThrottle={16}
+            scrollEventThrottle={scrollEventThrottle}
             onScroll={this.handleScroll}
             onTouchMove={this.handleTouchMoveScroll}
             onScrollEndDrag={this.handleEndScroll}>
