@@ -27,18 +27,24 @@ class Extension extends Component<IProps, IState> {
     const {handleBlurInput} = this.props;
     return (
       <ProviderChat.Consumer>
-        {({toggleCamera}) => (
+        {({toggleCamera, theme, toggleImage}) => (
           <View style={styles.view}>
             <Pressable
               style={styles.pressable}
               onPress={() => toggleCamera(true)}>
-              <IconIon style={styles.iconCamera} name="camera" />
+              <IconIon
+                style={[styles.iconCamera, theme.iconCamera]}
+                name="camera"
+              />
+            </Pressable>
+            <Pressable style={styles.pressable} onPress={() => toggleImage()}>
+              <IconIon
+                style={[styles.iconImage, theme.iconImage]}
+                name="image"
+              />
             </Pressable>
             <Pressable style={styles.pressable}>
-              <IconIon style={styles.iconImage} name="image" />
-            </Pressable>
-            <Pressable style={styles.pressable}>
-              <IconIon style={styles.iconMic} name="mic" />
+              <IconIon style={[styles.iconMic, theme.iconMic]} name="mic" />
             </Pressable>
             {visibleChevron ? (
               <Pressable

@@ -31,11 +31,13 @@ class KeyboardChat extends Component<ISwapView, IState> {
   animatedBegin: boolean;
   timeKeyboard: number;
   unsubHideKeyboard: boolean;
+  heightKeyboard: number;
   constructor(props: ISwapView) {
     super(props);
     this.state = {height: bar.bottomHeight};
     this.animatedBegin = false;
     this.timeKeyboard = 250;
+    this.heightKeyboard = 250;
     this.unsubHideKeyboard = false;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
   }
@@ -59,6 +61,7 @@ class KeyboardChat extends Component<ISwapView, IState> {
   onWillShow = (event: KeyboardEvent) => {
     const {keyboardDistanceFromInput = 0} = this.props;
     const {height} = this.state;
+    this.heightKeyboard = height;
     this.unsubHideKeyboard = false;
     const {endCoordinates, duration} = event;
     this.timeKeyboard = duration;
@@ -115,6 +118,10 @@ class KeyboardChat extends Component<ISwapView, IState> {
     }
     this.animatedLayout(this.timeKeyboard);
     this.setState({height});
+  };
+
+  unsubHideKeyboardFuc = () => {
+    this.unsubHideKeyboard = true;
   };
 
   render() {

@@ -52,7 +52,8 @@ class SwapChat extends Component<ISwapChatProps> {
   handlePressScroll = () => {
     const {provider} = this.props;
     const {toggleKeyboard, toggleImage, getHeightKeyboadOpening} = provider;
-    if (getHeightKeyboadOpening()) {
+    console.log(getHeightKeyboadOpening());
+    if (getHeightKeyboadOpening() > 0) {
       Keyboard.dismiss();
       toggleKeyboard(0);
       toggleImage(0);

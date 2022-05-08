@@ -9,7 +9,7 @@ export declare type IProviderChat = {
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
   toggleKeyboard: (_h: number) => any;
-  toggleImage: (_h: number) => any;
+  toggleImage: (_h?: number) => any;
   getHeightKeyboadOpening: () => number;
 };
 
@@ -23,7 +23,7 @@ const initValue: IProviderChat = {
   height: Dimensions.get('screen').height,
   toggleCamera: (_flag: boolean) => null,
   toggleKeyboard: (_h: number) => null,
-  toggleImage: (_h: number) => null,
+  toggleImage: (_h?: number) => null,
   getHeightKeyboadOpening: () => 0,
   theme,
   colorScheme: 'light',
