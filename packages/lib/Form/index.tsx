@@ -1,46 +1,31 @@
-import React, {ReactChild, Fragment, Component} from 'react';
+import {random} from '@/utils';
+import React, {Component, ReactChild, useRef} from 'react';
+import {View, NativeEventEmitter} from 'react-native';
+import Item from './Item';
 import {
-  View,
-  StyleSheet,
-  NativeEventEmitter,
-  ViewStyle,
-  Text,
-} from 'react-native';
-const form: any = {
-  ref: {},
-  value: {},
-  touched: {},
-  validateFirst: false,
+  IError,
+  IErrorForm,
+  IForm,
+  IFormHandle,
+  IFormHandleRemap,
+  IFormProps,
+  IItemProps,
+  IValueForm,
+} from './types';
+
+const uuid: string = random(26);
+
+const formControl: IForm = {
+  [uuid]: {
+    ref: {},
+    value: {},
+    touched: {},
+    validateFirst: false,
+  },
 };
 
-export interface IErrorForm {
-  [key: string]: any;
-}
-
-export interface IValueForm {
-  [key: string]: any;
-}
-
-export interface FormHandle {
-  setFieldsValue: (value: any, errors?: any) => void;
-  setFieldValue: (
-    key: string,
-    value?: any,
-    error?: ReactChild | undefined,
-  ) => void;
-  getFieldValue: (field: string) => any;
-  getFieldsValue: (fields: string[]) => any;
-  validateFields: (
-    calback: (err?: IErrorForm, values?: IValueForm) => any,
-    data?: {fields?: string[]; excepts?: string[]},
-  ) => Promise<any>;
-  resetFields: (fields?: any, errors?: any) => void;
-  setFieldError: (field: string, error?: any) => void;
-  getTouched: (field?: string) => any;
-}
-
 const handle: any = {};
-const handleForm: FormHandle = {
+const handleForm: IFormHandleRemap = {
   setFieldsValue: () => null,
   setFieldValue: () => null,
   getFieldValue: () => undefined,
@@ -51,322 +36,10 @@ const handleForm: FormHandle = {
   getTouched: () => undefined,
 };
 
-let errors: any = {};
-
-const styles = StyleSheet.create({
-  label: {},
-  Viewlabel: {
-    marginBottom: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dotRequired: {
-    color: '#ff4d4f',
-    marginRight: 4,
-  },
-  dotRequiredAfter: {
-    color: '#ff4d4f',
-    marginRight: 2,
-    marginLeft: 2,
-  },
-  layoutForm: {
-    flexDirection: 'row',
-  },
-  styleSpanCol: {
-    minHeight: 34,
-    paddingTop: 8.5,
-    paddingBottom: 8.5,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingRight: 8,
-  },
-  error: {
-    minHeight: 22,
-    fontSize: 12,
-    color: '#ff4d4f',
-    lineHeight: 16,
-    paddingBottom: 5,
-  },
-});
-
-interface IItemProps {
-  children?: any;
-  defaultValue?: any;
-  checked?: boolean;
-  name: string;
-  onBlurInput?: any;
-  onBlur?: any;
-  onParseField?: (v?: any, callback?: any) => any;
-  onChange?: (v: any, name: string) => any;
-  value?: any;
-  onPress?: (v?: any, key?: any) => any;
-  rule?: {
-    whitespace?: boolean;
-    required?: boolean;
-    message?: any;
-    validator?: (v: any, callback: (v?: any) => any, touched?: any) => any;
-    trigger?: 'onChange' | 'blur';
-  };
-  validateFirst?: (v?: any) => any;
-  onValueChange?: (v?: any, key?: string) => any;
-  onChangeText?: (v?: any, name?: string) => any;
-  onChangeInput?: (v?: any, key?: any) => any;
-  label?: any;
-  colon?: string;
-  dotRequired?: string;
-  formItemLayout?: {
-    labelCol: {
-      xs: number;
-      sm: number;
-    };
-    wrapperCol: {
-      xs: number;
-      sm: number;
-    };
-  };
-}
-
-interface IStateItem {
-  valueState: {value: any; error: any};
-  initialValues: {value: any; error: any};
-}
-
-class Item extends Component<IItemProps, IStateItem> {
-  constructor(props: IItemProps) {
-    super(props);
-    const {value, defaultValue, validateFirst, name} = props;
-    const initialValues = {value: value || defaultValue, error: undefined};
-    this.state = {
-      valueState: {value: value || defaultValue, error: undefined},
-      initialValues,
-    };
-    this.handleRemapItem(props);
-    if (name && validateFirst) {
-      form.ref[name](initialValues.value);
-    }
-  }
-
-  shouldComponentUpdate(nProps: IItemProps, nState: IStateItem) {
-    const {label, children} = this.props;
-    const {valueState} = this.state;
-    return (
-      label !== nProps.label ||
-      valueState !== nState.valueState ||
-      children !== nProps.children
-    );
-  }
-
-  componentWillUnmount() {
-    const {name} = this.props;
-    delete errors[name];
-    delete form.ref[name];
-    delete form.value[name];
-    delete form.touched[name];
-  }
-
-  handleRemapItem = (props: IItemProps) => {
-    const {name, onParseField, defaultValue, onChangeInput, rule = {}} = props;
-    if (name && onParseField) {
-      onParseField(name, defaultValue);
-      form.ref[name] = (
-        val: string | undefined = undefined,
-        error: string,
-        detectValidate?: boolean,
-      ) => {
-        const {initialValues} = this.state;
-        const {value} = this.props;
-        if (!detectValidate && onChangeInput) {
-          onChangeInput(val);
-        }
-        if ((val || '') !== (initialValues.value || '')) {
-          form.touched[name] = true;
-        } else {
-          form.touched[name] = false;
-        }
-        const newValue = {...value, value: val};
-        let v = val;
-        if (rule.whitespace && v && typeof v === 'string') {
-          v = v.trim();
-        }
-        if (error) {
-          newValue.error = error;
-        } else if (rule.required && !v) {
-          if (rule.message) {
-            newValue.error = rule.message;
-          } else {
-            newValue.error = 'Field is required';
-          }
-        } else if (
-          rule.validator &&
-          typeof rule.validator === 'function' &&
-          (rule.trigger === 'onChange' || !rule.trigger || detectValidate)
-        ) {
-          rule.validator(
-            v,
-            (message: string | undefined) => {
-              newValue.error = message;
-            },
-            form.touched,
-          );
-        }
-        if (newValue.error) {
-          if (errors[name] !== newValue.error) {
-            errors[name] = newValue.error;
-          }
-        } else {
-          delete errors[name];
-        }
-        this.setState({valueState: newValue});
-      };
-    }
-  };
-
-  renderWithLabel = (
-    styleForm: object | undefined,
-    styleSpanCol: object | undefined,
-    styleSpanWrapCol: object | undefined,
-  ) => {
-    const {
-      dotRequired,
-      rule = {},
-      label,
-      name,
-      colon,
-      children,
-      onChange,
-      onPress,
-      onChangeText,
-      onValueChange,
-      onBlur,
-      onBlurInput,
-    } = this.props;
-    const {valueState} = this.state;
-    return (
-      <View style={styleForm}>
-        <View style={styleSpanCol}>
-          <View style={styles.Viewlabel}>
-            {rule.required && dotRequired === 'before' ? (
-              <Text style={styles.dotRequired}>*</Text>
-            ) : null}
-            {typeof label === 'string' ? (
-              <Text style={styles.label}>{label}</Text>
-            ) : (
-              label
-            )}
-            {rule.required && dotRequired === 'after' ? (
-              <Text style={styles.dotRequiredAfter}>*</Text>
-            ) : null}
-            <Text>{colon ? ':' : ''}</Text>
-          </View>
-        </View>
-        <View style={styleSpanWrapCol}>
-          {{
-            ...children,
-            props: {
-              ...children.props,
-              onChange: (v: string) => onChange?.(v, name),
-              value: valueState.value,
-              error: valueState.error,
-              onPress: (e: NativeEventEmitter) =>
-                onPress?.(e, children.props.onPress),
-              onValueChange: (e: NativeEventEmitter) =>
-                onValueChange?.(e, name),
-              onChangeText: (e: NativeEventEmitter) => onChangeText?.(e, name),
-              checked: !!valueState.value,
-              onBlur: (e: NativeEventEmitter) => {
-                if (typeof onBlur === 'function') {
-                  onBlur(e);
-                }
-                if (
-                  typeof onBlurInput === 'function' &&
-                  rule.trigger === 'blur'
-                ) {
-                  onBlurInput(name, valueState.value);
-                }
-              },
-            },
-          }}
-          <Text style={styles.error}>{valueState.error}</Text>
-        </View>
-      </View>
-    );
-  };
-
-  render() {
-    const {
-      children,
-      name,
-      onChange,
-      onPress = () => null,
-      rule = {},
-      onValueChange,
-      onChangeText,
-      label,
-      onBlurInput,
-      onBlur,
-    } = this.props;
-    const {valueState} = this.state;
-
-    if (label) {
-      return this.renderWithLabel(undefined, undefined, undefined);
-    }
-
-    return (
-      <Fragment>
-        {{
-          ...children,
-          props: {
-            ...children.props,
-            onChange: (v: string) => onChange?.(v, name),
-            value: valueState.value,
-            error: valueState.error,
-            onPress: (e: NativeEventEmitter) =>
-              onPress(e, children.props.onPress),
-            onValueChange: (e: NativeEventEmitter) => onValueChange?.(e, name),
-            onChangeText: (e: NativeEventEmitter) => onChangeText?.(e, name),
-            checked: !!valueState.value,
-            onBlur: (e: NativeEventEmitter) => {
-              if (typeof onBlur === 'function') {
-                onBlur(e);
-              }
-              if (
-                typeof onBlurInput === 'function' &&
-                rule.trigger === 'blur'
-              ) {
-                onBlurInput(name, valueState.value);
-              }
-            },
-          },
-        }}
-        <Text style={styles.error}>{valueState.error}</Text>
-      </Fragment>
-    );
-  }
-}
-
-interface IFormProps {
-  initialValues?: {
-    [key: string]: any;
-  };
-  children: any;
-  validateFirst?: (v?: any) => any;
-  style?: ViewStyle;
-  colon?: boolean;
-  formItemLayout?: {
-    labelCol: {
-      xs: number;
-      sm: number;
-    };
-    wrapperCol: {
-      xs: number;
-      sm: number;
-    };
-  };
-  dotRequired?: 'before' | 'after';
-}
+let errors: IError = {};
 
 class Form extends Component<IFormProps> {
-  static useForm: () => FormHandle;
+  static useForm: () => IFormHandle;
   static Item: (props: IItemProps) => JSX.Element;
   static create: () => (
     WrapComponent: React.ComponentType<any>,
@@ -384,10 +57,10 @@ class Form extends Component<IFormProps> {
       colon,
       formItemLayout,
       dotRequired = 'after',
+      form,
     } = this.props;
     handle.onChange = this.onChange;
     handle.onBlurInput = this.onBlurInput;
-    handle.onValueChange = this.onChange;
     handle.onParseField = this.onParseField;
     handle.onPress = this.onPress;
     handle.colon = colon;
@@ -401,75 +74,128 @@ class Form extends Component<IFormProps> {
     handleForm.setFieldError = this.setFieldError;
     handleForm.resetFields = this.resetFields;
     handleForm.getTouched = this.getTouched;
-    form.validateFirst = validateFirst;
-    const data = Object.keys(initialValues).map(
-      async key => (form.value[key] = initialValues[key]),
-    );
+    if (form?.uid) {
+      formControl[form?.uid] = {
+        ref: {},
+        value: {},
+        touched: {},
+      };
+    }
+    let uid = form?.uid || uuid;
+    formControl[uid].validateFirst = validateFirst;
+    const data = Object.keys(initialValues).map(async key => {
+      formControl[uid].value[key] = initialValues[key];
+    });
     await Promise.all(data);
   };
 
-  onChange = (v: any, name: string, error?: string) => {
-    form.value[name] = v;
-    if (typeof form.ref[name] === 'function') {
-      form.ref[name](v, error);
+  componentWillUnmount() {
+    const {form} = this.props;
+    if (form?.uid) {
+      delete formControl[form.uid];
+    }
+  }
+
+  onChange = (v: any, name: string, error?: string, uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
+    formControl[uid].value[name] = v;
+    if (typeof formControl[uid].ref[name] === 'function') {
+      formControl[uid].ref[name](v, error);
     }
   };
 
-  onBlurInput = (name: string, v: any) => {
-    form.ref[name]?.(v, undefined, true);
+  onBlurInput = (name: string, v: any, uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
+    formControl[uid].ref[name]?.(v, undefined, true);
   };
 
-  onParseField = (name: string, value?: any) => {
+  onParseField = (name: string, value?: any, uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
     const {initialValues} = this.props;
     if (value !== undefined || initialValues?.[name] !== undefined) {
-      form.value[name] = value || initialValues?.[name];
+      formControl[uid].value[name] = value || initialValues?.[name];
     } else {
-      form.value[name] = initialValues?.[name];
+      formControl[uid].value[name] = initialValues?.[name];
     }
   };
 
-  onPress = (e: NativeEventEmitter, func: any) => {
+  onPress = (e: NativeEventEmitter, func: any, uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
     if (typeof func === 'function') {
       func(e, {
-        value: form.value,
+        value: formControl[uid].value,
         erorrs: Object.keys(errors).map(key => ({[key]: errors[key]})),
       });
     }
   };
 
-  setFieldsValue = async (values: any, errorsValue: any = {}) => {
+  setFieldsValue = async (
+    values: any,
+    errorsValue: any = {},
+    uid: string = uuid,
+  ) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
     const promise = Object.keys(values).map(async key => {
-      if (typeof form.ref[key] === 'function') {
-        form.value[key] = values[key];
+      if (typeof formControl[uid].ref[key] === 'function') {
+        formControl[uid].value[key] = values[key];
         return this.onChange(values[key], key, errorsValue[key]);
       }
     });
     await Promise.all(promise);
   };
 
-  setFieldValue(key: string, value: any, error: any) {
-    form.value[key] = value;
-    if (typeof form.ref[key] === 'function') {
-      form.ref[key](value, error);
+  setFieldValue(key: string, value: any, error: any, uid: string = uuid) {
+    if (!uid || !formControl[uid]) {
+      uid = uuid;
+    }
+    formControl[uid].value[key] = value;
+    if (typeof formControl[uid].ref[key] === 'function') {
+      formControl[uid].ref[key](value, error);
     }
   }
 
-  getFieldValue = (key: string) => {
-    return form.value[key];
+  getFieldValue = (key: string, uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
+    return formControl[uid].value[key];
   };
 
-  getFieldsValue = () => {
-    return form.value;
+  getFieldsValue = (uid: string = uuid) => {
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
+    return formControl[uid].value;
   };
 
   validateFields = async (
     calback: (err?: IErrorForm[], v?: IValueForm) => any,
     custom?: {fields?: string[]; excepts?: string[]},
+    uid: string = uuid,
   ) => {
-    const {fields = Object.keys(form.value), excepts} = custom || {};
+    if (!formControl[uid]) {
+      uid = uuid;
+    }
+    const {fields = Object.keys(formControl[uid].value), excepts} =
+      custom || {};
+
     const promise = fields.map(async key => {
-      if (typeof form.ref[key] === 'function') {
-        return form.ref[key](form.value[key], undefined, true);
+      if (typeof formControl[uid].ref[key] === 'function') {
+        return formControl[uid].ref[key](
+          formControl[uid].value[key],
+          undefined,
+          true,
+        );
       }
     });
     await Promise.all(promise);
@@ -486,55 +212,136 @@ class Form extends Component<IFormProps> {
       errorArr = undefined;
     }
     if (calback && typeof calback === 'function') {
-      calback(errorArr, form.value);
+      calback(errorArr, formControl[uid].value);
     }
   };
 
-  setFieldError = (field: string, error?: string) => {
-    if (typeof form.ref[field] === 'function') {
-      form.ref[field](form.value[field], error);
+  setFieldError = (field: string, error?: string, uid: string = uuid) => {
+    if (!uid || !formControl[uid]) {
+      uid = uuid;
+    }
+    if (typeof formControl[uid].ref[field] === 'function') {
+      formControl[uid].ref[field](formControl[uid].value[field], error);
     }
   };
 
   resetFields = async (
-    fields: any[] = Object.keys(form.value),
+    fields: any[],
     errorsValue: any = {},
+    uid: string = uuid,
   ) => {
-    const promise = fields.map(async key => {
-      return this.onChange(undefined, key, errorsValue[key]);
-    });
+    if (!uid || !formControl[uid]) {
+      uid = uuid;
+    }
+    const promise = (fields || Object.keys(formControl[uid].value)).map(
+      async key => {
+        return this.onChange(undefined, key, errorsValue[key]);
+      },
+    );
     await Promise.all(promise);
   };
 
-  getTouched = (field?: string) => {
-    if (!field) {
-      return form.touched;
+  getTouched = (field?: string, uid: string = uuid) => {
+    if (!uid || !formControl[uid]) {
+      uid = uuid;
     }
-    return form.touched?.[field];
+    if (!field) {
+      return formControl[uid].touched;
+    }
+    return formControl[uid].touched?.[field];
+  };
+
+  renderChild = (child: any) => {
+    const {form} = this.props;
+    return {...child, props: {...child.props, form}};
   };
 
   render() {
     const {style, children} = this.props;
-    return <View style={style}>{children}</View>;
+    if (!children) {
+      return null;
+    }
+    return (
+      <View style={style}>
+        {Array.isArray(children)
+          ? children.map((child: any) => this.renderChild(child))
+          : this.renderChild(children)}
+      </View>
+    );
   }
 }
 
-Form.useForm = (): FormHandle => {
-  return handleForm;
+function createUid(): string {
+  const uid = random(26);
+  if (formControl[uid]) {
+    return createUid();
+  }
+  return uid;
+}
+
+Form.useForm = (): IFormHandle & {uid: string} => {
+  const uid = useRef(createUid()).current;
+  return {
+    setFieldsValue: (value: any, errs?: any) => {
+      return handleForm.setFieldsValue(value, errs, uid);
+    },
+    setFieldValue: (
+      key: string,
+      value?: any,
+      error?: ReactChild | undefined,
+    ) => {
+      return handleForm.setFieldValue(key, value, error, uid);
+    },
+    getFieldValue: (field: string) => {
+      return handleForm.getFieldValue(field, uid);
+    },
+    getFieldsValue: () => {
+      return handleForm.getFieldsValue(uid);
+    },
+    validateFields: (
+      calback: (err?: IErrorForm, values?: IValueForm) => any,
+      data?: {fields?: string[]; excepts?: string[]},
+    ) => {
+      return handleForm.validateFields(calback, data, uid);
+    },
+    setFieldError: (field: string, error?: any) => {
+      return handleForm.setFieldError(field, error, uid);
+    },
+    resetFields: (fields?: any, errs?: any) => {
+      return handleForm.resetFields(fields, errs, uid);
+    },
+    getTouched: (field?: string) => {
+      return handleForm.getTouched(field, uid);
+    },
+    uid,
+  };
 };
 
 Form.Item = (props: IItemProps) => {
+  const newProps: any = props;
+  const {form} = newProps;
+  const uid = form?.uid || uuid;
+  const formControlItem: any = formControl[uid];
   return (
     <Item
       {...props}
-      onChange={handle.onChange}
-      onChangeText={handle.onChange}
-      onValueChange={handle.onValueChange}
+      errors={errors}
+      form={formControlItem}
+      onChange={(v: any, name: string, error?: string) => {
+        return handle.onChange(v, name, error, uid);
+      }}
+      onChangeText={(v: any, name: string) => {
+        return handle.onChange(v, name, undefined, uid);
+      }}
+      onValueChange={(v: any, name: string) => {
+        return handle.onChange(v, name, undefined, uid);
+      }}
       onChangeInput={props.onChange}
-      onParseField={handle.onParseField}
+      onParseField={(v: any, callback: any) => {
+        return handle.onParseField(v, callback, uid);
+      }}
       onPress={handle.onPress}
-      value={form[props.name] || props.defaultValue}
-      validateFirst={form.validateFirst}
+      value={formControlItem?.[props.name] || props.defaultValue}
       colon={handle.colon}
       dotRequired={handle.dotRequired}
       formItemLayout={handle.formItemLayout}

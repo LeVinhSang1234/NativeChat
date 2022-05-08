@@ -1,8 +1,10 @@
 import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
 import {theme} from '@/ChatProvider/theme';
-import Text from '@/lib/Text';
+import {IFormHandle} from '@/lib/Form/types';
+import TextInput from '@/lib/TextInput';
 import React, {Component} from 'react';
 import {
+  Button,
   ImageBackground,
   Keyboard,
   Pressable,
@@ -10,6 +12,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import {Form} from '..';
 
 export declare type IChatProps = {
   user: {
@@ -19,15 +22,20 @@ export declare type IChatProps = {
   avatar_url_failback?: string;
 };
 
-class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
+interface ISwapChatProps extends IChatProps {
+  provider: IProviderChat;
+  form: IFormHandle;
+}
+
+class SwapChat extends Component<ISwapChatProps> {
   isMoveScroll: boolean;
 
-  constructor(props: IChatProps & {provider: IProviderChat}) {
+  constructor(props: ISwapChatProps) {
     super(props);
     this.isMoveScroll = false;
   }
 
-  shouldComponentUpdate(nProps: IChatProps & {provider: IProviderChat}) {
+  shouldComponentUpdate(nProps: ISwapChatProps) {
     const {provider} = this.props;
     return (
       provider.height !== nProps.provider.height ||
@@ -57,6 +65,7 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
   };
 
   render() {
+    const {form} = this.props;
     return (
       <View style={styles.view} removeClippedSubviews>
         <ScrollView
@@ -75,7 +84,33 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
               style={{
                 backgroundColor: theme.chatBody?.backgroundColor,
               }}>
-              <Text>sangsangsangsangsangsangsangsangsangsangsangsang</Text>
+              <Form>
+                <Form.Item
+                  name="name"
+                  rule={{
+                    required: true,
+                  }}>
+                  <TextInput style={styles.input} />
+                </Form.Item>
+                <Form.Item
+                  name="name2"
+                  rule={{
+                    required: true,
+                  }}>
+                  <TextInput style={styles.input} />
+                </Form.Item>
+                <Form.Item name="name3">
+                  <TextInput style={styles.input} />
+                </Form.Item>
+                <Button
+                  onPress={() => {
+                    form.validateFields((err, values) => {
+                      console.log(values, err);
+                    });
+                  }}
+                  title="asdasdsas"
+                />
+              </Form>
             </ImageBackground>
           </Pressable>
         </ScrollView>
@@ -86,12 +121,13 @@ class SwapChat extends Component<IChatProps & {provider: IProviderChat}> {
 
 const Chat = React.forwardRef((props: IChatProps, ref: any) => {
   const value = useProviderChat();
-  return <SwapChat {...props} provider={value} ref={ref} />;
+  const form = Form.useForm();
+  return <SwapChat {...props} provider={value} ref={ref} form={form} />;
 });
 
 const styles = StyleSheet.create({
   view: {
-    flex: 1,
+    flexGrow: 1,
     transform: [{scaleY: -1}],
   },
   scrollView: {
@@ -105,6 +141,10 @@ const styles = StyleSheet.create({
   contentStyle: {
     flexGrow: 1,
     justifyContent: 'flex-end',
+  },
+  input: {
+    height: 40,
+    backgroundColor: '#e3e3e3',
   },
 });
 

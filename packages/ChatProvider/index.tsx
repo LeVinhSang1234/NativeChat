@@ -11,7 +11,7 @@ import {
 import {ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
 import KeyboardChat from './KeyboardChat';
-import {BlurView} from '@react-native-community/blur';
+import BlurView from '@/lib/BlurView';
 
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
