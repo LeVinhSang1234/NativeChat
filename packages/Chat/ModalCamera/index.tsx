@@ -26,7 +26,7 @@ class ModalCamera extends Component<IModalProps, IModalState> {
     const {isCamera} = this.state;
     return (
       <Modal
-        // animationType="slide"
+        animationType="slide"
         visible={isCamera}
         onRequestClose={this.toggleVisible}>
         <Suspense fallback={null}>

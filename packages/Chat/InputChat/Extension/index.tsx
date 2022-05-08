@@ -38,7 +38,7 @@ class Extension extends Component<IProps, IState> {
               <IconIon style={styles.iconImage} name="image" />
             </Pressable>
             <Pressable style={styles.pressable}>
-              <IconIon style={styles.iconImage} name="mic" />
+              <IconIon style={styles.iconMic} name="mic" />
             </Pressable>
             {visibleChevron ? (
               <Pressable
@@ -67,6 +67,11 @@ const styles = StyleSheet.create({
     marginBottom: -1.2,
   },
   iconImage: {
+    fontSize: 28,
+    color: backgroundIconChat,
+    paddingLeft: 5,
+  },
+  iconMic: {
     fontSize: 28,
     color: backgroundIconChat,
   },

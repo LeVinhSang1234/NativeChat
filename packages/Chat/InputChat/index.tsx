@@ -26,11 +26,13 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
   animatedBegin?: boolean;
   buttonSend?: ButtonSend | null;
   extension?: Extension | null;
+  isLoadLayoutSucess: boolean;
 
   constructor(props: ISwapInputProps) {
     super(props);
     const {provider} = props;
     this.state = {width: provider.width - 187, value: ''};
+    this.isLoadLayoutSucess = false;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 15);
   }
 
@@ -83,7 +85,13 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
   };
 
   onContentChangeSize = () => {
-    this.animatedLayout();
+    if (this.isLoadLayoutSucess) {
+      this.animatedLayout();
+    }
+  };
+
+  onLayoutInput = () => {
+    this.isLoadLayoutSucess = true;
   };
 
   render() {
@@ -98,6 +106,7 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
           ref={ref => (this.extension = ref)}
         />
         <TextInput
+          onLayout={this.onLayoutInput}
           onContentSizeChange={this.onContentChangeSize}
           onBlur={this.handleBlurInput}
           onPressIn={this.handlePressInput}

@@ -30,7 +30,6 @@ interface IState {
   width: number;
   height: number;
   theme: ITheme;
-  heightKeyboard: number;
 }
 
 interface IPropsChatSwap extends IChatProviderProps {
@@ -55,7 +54,6 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       width: Dimensions.get('screen').width,
       height: Dimensions.get('screen').height,
       theme: this.styleIcon,
-      heightKeyboard: 0,
     };
   }
 
@@ -71,7 +69,6 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
 
   toggleKeyboard = (height: number) => {
     this.viewKeyboard?.toggleKeyboard?.(height);
-    this.setState({heightKeyboard: height});
   };
 
   toggleImage = (height: number) => {
@@ -84,16 +81,14 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     this.setState({theme: {...themeState, ...newTheme}});
   };
 
+  getHeightKeyboadOpening = () => {
+    return this.viewKeyboard?.state.height || 0;
+  };
+
   render() {
     const {children, colorScheme, keyboardDistanceFromInput, style} =
       this.props;
-    const {
-      loading,
-      width,
-      height,
-      theme: themeState,
-      heightKeyboard,
-    } = this.state;
+    const {loading, width, height, theme: themeState} = this.state;
     const provider = {
       width,
       height,
@@ -102,8 +97,9 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       toggleKeyboard: this.toggleKeyboard,
       theme: {...theme, ...themeState},
       colorScheme,
-      heightKeyboard,
+      getHeightKeyboadOpening: this.getHeightKeyboadOpening,
     };
+
     return (
       <ProviderChat.Provider value={provider}>
         <View style={[styles.view, style]} onLayout={this.handleLayout}>
