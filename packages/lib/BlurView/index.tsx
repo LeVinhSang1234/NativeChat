@@ -5,7 +5,7 @@ import {
   BlurViewProperties,
 } from '@react-native-community/blur';
 
-function BlurView(props: BlurViewProperties & {children: any}) {
+function BlurView(props: BlurViewProperties & {children?: any}) {
   const {style, children, blurType} = props;
   const colorScheme = useColorScheme();
   return (
