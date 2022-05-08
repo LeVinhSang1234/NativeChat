@@ -32,13 +32,17 @@ class KeyboardChat extends Component<ISwapView, IState> {
   timeKeyboard: number;
   unsubHideKeyboard: boolean;
   heightKeyboard: number;
+  isOpenKeyboard: boolean;
+  heightFirstKeyboard: number;
   constructor(props: ISwapView) {
     super(props);
     this.state = {height: bar.bottomHeight};
     this.animatedBegin = false;
     this.timeKeyboard = 250;
     this.heightKeyboard = 250;
+    this.heightFirstKeyboard = 0;
     this.unsubHideKeyboard = false;
+    this.isOpenKeyboard = false;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
   }
 
@@ -61,22 +65,26 @@ class KeyboardChat extends Component<ISwapView, IState> {
   onWillShow = (event: KeyboardEvent) => {
     const {keyboardDistanceFromInput = 0} = this.props;
     const {height} = this.state;
-    this.heightKeyboard = height;
-    this.unsubHideKeyboard = false;
     const {endCoordinates, duration} = event;
+    this.heightKeyboard = endCoordinates.height;
+    this.unsubHideKeyboard = false;
     this.timeKeyboard = duration;
-    if (height === bar.bottomHeight) {
+    if (this.heightFirstKeyboard === 0) {
+      this.heightFirstKeyboard = endCoordinates.height;
+    }
+    if (height === bar.bottomHeight || !this.isOpenKeyboard) {
       this.animatedLayout(duration);
     }
+    this.isOpenKeyboard = true;
     this.setState({
       height: endCoordinates.height + keyboardDistanceFromInput,
     });
   };
 
   onWillHide = (event: KeyboardEvent) => {
+    this.isOpenKeyboard = false;
     if (!this.unsubHideKeyboard) {
       const {duration} = event;
-      this.timeKeyboard = duration;
       this.animatedLayout(duration);
       this.setState({height: bar.bottomHeight});
     }
@@ -124,6 +132,12 @@ class KeyboardChat extends Component<ISwapView, IState> {
     this.unsubHideKeyboard = true;
   };
 
+  onDidHide = () => {
+    if (this.heightFirstKeyboard) {
+      this.heightKeyboard = this.heightFirstKeyboard;
+    }
+  };
+
   render() {
     const {height} = this.state;
     const {inputToolbar} = this.props;
@@ -135,6 +149,7 @@ class KeyboardChat extends Component<ISwapView, IState> {
             onWillShow={this.onWillShow}
             onWillHide={this.onWillHide}
             onDidShow={this.onDidShow}
+            onDidHide={this.onDidHide}
           />
         </View>
       </BlurView>

@@ -70,8 +70,8 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
   };
 
   handleOnSend = () => {
-    const {value} = this.state;
-    console.log('value ==>', value);
+    // const {value} = this.state;
+    // console.log('value ==>', value);
   };
 
   handleChangeText = (text: string) => {

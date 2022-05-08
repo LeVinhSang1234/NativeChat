@@ -144,6 +144,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
           />
           <BottomDrag
             unsubHideKeyboardView={this.unsubHideKeyboardView}
+            colorScheme={colorScheme}
             ref={ref => (this.bottomDrag = ref)}>
             <Text>Sang</Text>
             <Text>Sang</Text>
