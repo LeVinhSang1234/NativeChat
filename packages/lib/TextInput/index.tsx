@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {
   TextInput as InputLibrary,
   TextInputProps,
   useColorScheme,
 } from 'react-native';
 
-function TextInput(props: TextInputProps) {
+const TextInputFunc = React.forwardRef((props: TextInputProps, ref: any) => {
   const {style, value, children, ...p} = props;
   const colorScheme = useColorScheme();
   let colorText;
@@ -13,10 +13,20 @@ function TextInput(props: TextInputProps) {
     colorText = '#fff';
   }
   return (
-    <InputLibrary value={value} style={[{color: colorText}, style]} {...p}>
+    <InputLibrary
+      ref={ref}
+      value={value}
+      style={[{color: colorText}, style]}
+      {...p}>
       {children}
     </InputLibrary>
   );
+});
+
+class TextInput extends Component<TextInputProps> {
+  render() {
+    return <TextInputFunc {...this.props} />;
+  }
 }
 
 export default TextInput;

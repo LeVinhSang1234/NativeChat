@@ -370,6 +370,8 @@ PODS:
     - React-Core
   - RNReactNativeHapticFeedback (1.13.1):
     - React-Core
+  - RNSVG (12.3.0):
+    - React-Core
   - RNVectorIcons (9.1.0):
     - React-Core
   - SocketRocket (0.6.0)
@@ -439,6 +441,7 @@ DEPENDENCIES:
   - RNConvertPhAsset (from `../node_modules/react-native-convert-ph-asset`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -535,6 +538,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-device-info"
   RNReactNativeHapticFeedback:
     :path: "../node_modules/react-native-haptic-feedback"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   Yoga:
@@ -591,6 +596,7 @@ SPEC CHECKSUMS:
   RNConvertPhAsset: 9b366b8a1abc194b76572712c6f7dd89c9e4e37f
   RNDeviceInfo: 36286df381fcaf1933ff9d2d3c34ba2abeb2d8d8
   RNReactNativeHapticFeedback: 4085973f5a38b40d3c6793a3ee5724773eae045e
+  RNSVG: 302bfc9905bd8122f08966dc2ce2d07b7b52b9f8
   RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 17cd9a50243093b547c1e539c749928dd68152da
@@ -598,4 +604,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 992853c2ee77873ad232475bd7af2fcd5afa54e7
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

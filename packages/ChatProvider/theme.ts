@@ -83,6 +83,8 @@ export const theme: ITheme = {
     paddingBottom: 10,
     paddingTop: 10,
     paddingHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   bottomImage: {
     header: {

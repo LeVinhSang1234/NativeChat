@@ -1,4 +1,4 @@
-import TextInput from '@/lib/TextInput';
+import InputChat from '@/Chat/InputChat';
 import {debounce} from '@/utils';
 import bar from '@/utils/bar';
 import React, {Component} from 'react';
@@ -10,11 +10,11 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {KeyboardListener} from '..';
-import {IProviderChat} from './Provider';
+import {BlurView, KeyboardListener} from '..';
+import {IProviderChat} from '../ChatProvider/Provider';
 interface IViewKeyboardProps {
   backgroundColor?: string;
-  keyboardDistance?: number;
+  keyboardDistanceFromInput?: number;
   inputToolbar?: any;
   onShowKeyboard?: any;
   onHideKeyboard?: any;
@@ -33,7 +33,7 @@ class KeyboardChat extends Component<ISwapView, IState> {
   unsubHideKeyboard: boolean;
   constructor(props: ISwapView) {
     super(props);
-    this.state = {height: 0};
+    this.state = {height: bar.bottomHeight};
     this.animatedBegin = false;
     this.timeKeyboard = 250;
     this.unsubHideKeyboard = false;
@@ -45,26 +45,28 @@ class KeyboardChat extends Component<ISwapView, IState> {
   }
 
   shouldComponentUpdate(nProps: ISwapView, nState: IState) {
-    const {keyboardDistance, backgroundColor} = this.props;
+    const {keyboardDistanceFromInput, backgroundColor, inputToolbar} =
+      this.props;
     const {height} = this.state;
     return (
       backgroundColor !== nProps.backgroundColor ||
+      inputToolbar !== nProps.inputToolbar ||
       height !== nState.height ||
-      keyboardDistance !== nProps.keyboardDistance
+      keyboardDistanceFromInput !== nProps.keyboardDistanceFromInput
     );
   }
 
   onWillShow = (event: KeyboardEvent) => {
-    const {keyboardDistance = 0} = this.props;
+    const {keyboardDistanceFromInput = 0} = this.props;
     const {height} = this.state;
     this.unsubHideKeyboard = false;
     const {endCoordinates, duration} = event;
     this.timeKeyboard = duration;
-    if (height === 0) {
+    if (height === bar.bottomHeight) {
       this.animatedLayout(duration);
     }
     this.setState({
-      height: endCoordinates.height + bar.bottomHeight - keyboardDistance,
+      height: endCoordinates.height + keyboardDistanceFromInput,
     });
   };
 
@@ -73,7 +75,7 @@ class KeyboardChat extends Component<ISwapView, IState> {
       const {duration} = event;
       this.timeKeyboard = duration;
       this.animatedLayout(duration);
-      this.setState({height: 0});
+      this.setState({height: bar.bottomHeight});
     }
   };
 
@@ -117,15 +119,18 @@ class KeyboardChat extends Component<ISwapView, IState> {
 
   render() {
     const {height} = this.state;
+    const {inputToolbar} = this.props;
     return (
-      <View style={[styles.view, {minHeight: height}]}>
-        <TextInput style={styles.input} multiline />
-        <KeyboardListener
-          onWillShow={this.onWillShow}
-          onWillHide={this.onWillHide}
-          onDidShow={this.onDidShow}
-        />
-      </View>
+      <BlurView blurAmount={20}>
+        {inputToolbar || <InputChat />}
+        <View style={[styles.view, {height}]}>
+          <KeyboardListener
+            onWillShow={this.onWillShow}
+            onWillHide={this.onWillHide}
+            onDidShow={this.onDidShow}
+          />
+        </View>
+      </BlurView>
     );
   }
 }

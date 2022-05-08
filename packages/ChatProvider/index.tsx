@@ -7,11 +7,11 @@ import {
   Dimensions,
   useColorScheme,
   LogBox,
+  ViewStyle,
 } from 'react-native';
 import {ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
-import KeyboardChat from './KeyboardChat';
-import BlurView from '@/lib/BlurView';
+import KeyboardChat from '../Chat/KeyboardChat';
 
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
@@ -19,8 +19,9 @@ LogBox.ignoreLogs([
 ]);
 
 export declare type IChatProviderProps = {
-  keyboardDistance?: number;
+  keyboardDistanceFromInput?: number;
   children?: any;
+  style?: ViewStyle;
 };
 
 interface IState {
@@ -83,7 +84,8 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   };
 
   render() {
-    const {children, colorScheme, keyboardDistance} = this.props;
+    const {children, colorScheme, keyboardDistanceFromInput, style} =
+      this.props;
     const {
       loading,
       width,
@@ -103,15 +105,13 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     };
     return (
       <ProviderChat.Provider value={provider}>
-        <View style={styles.view} onLayout={this.handleLayout}>
+        <View style={[styles.view, style]} onLayout={this.handleLayout}>
           {loading ? null : children}
-          <BlurView>
-            <KeyboardChat
-              provider={provider}
-              ref={ref => (this.viewKeyboard = ref)}
-              keyboardDistance={keyboardDistance}
-            />
-          </BlurView>
+          <KeyboardChat
+            provider={provider}
+            ref={ref => (this.viewKeyboard = ref)}
+            keyboardDistanceFromInput={keyboardDistanceFromInput}
+          />
           <ModalCamera ref={ref => (this.modalCamera = ref)} />
         </View>
       </ProviderChat.Provider>

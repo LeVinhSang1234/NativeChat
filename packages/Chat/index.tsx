@@ -10,6 +10,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import {BlurView} from '..';
 
 export declare type IChatProps = {
   user: {
@@ -62,7 +63,7 @@ class SwapChat extends Component<ISwapChatProps> {
 
   render() {
     return (
-      <View style={styles.view} removeClippedSubviews>
+      <BlurView style={styles.view}>
         <ScrollView
           removeClippedSubviews
           onTouchMove={this.onMouseMove}
@@ -85,10 +86,50 @@ class SwapChat extends Component<ISwapChatProps> {
               <Text>Sang</Text>
               <Text>Sang</Text>
               <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <View style={{backgroundColor: 'red'}}>
+                <Text>Sang</Text>
+              </View>
             </ImageBackground>
           </Pressable>
         </ScrollView>
-      </View>
+      </BlurView>
     );
   }
 }
@@ -100,11 +141,11 @@ const Chat = React.forwardRef((props: IChatProps, ref: any) => {
 
 const styles = StyleSheet.create({
   view: {
-    flexGrow: 1,
+    flex: 1,
     transform: [{scaleY: -1}],
+    overflow: 'visible',
   },
   scrollView: {
-    flexGrow: 1,
     overflow: 'visible',
   },
   contentPress: {
