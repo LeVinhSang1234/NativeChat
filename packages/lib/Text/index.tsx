@@ -1,12 +1,19 @@
 import React from 'react';
 import {Text as TextLibrary, TextProps, useColorScheme} from 'react-native';
 
-function Text(props: TextProps) {
-  const {children, style} = props;
+function Text(
+  props: TextProps & {colorModeDark?: string; colorModeLight?: string},
+) {
+  const {
+    children,
+    style,
+    colorModeDark = '#fff',
+    colorModeLight = '#000',
+  } = props;
   const colorScheme = useColorScheme();
-  let colorText;
+  let colorText = colorModeDark;
   if (colorScheme === 'dark') {
-    colorText = '#fff';
+    colorText = colorModeLight;
   }
   return (
     <TextLibrary style={[{color: colorText}, style]}>{children}</TextLibrary>

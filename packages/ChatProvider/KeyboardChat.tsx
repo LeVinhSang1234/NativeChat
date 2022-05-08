@@ -1,20 +1,24 @@
+import TextInput from '@/lib/TextInput';
+import {debounce} from '@/utils';
 import bar from '@/utils/bar';
 import React, {Component} from 'react';
 import {
   KeyboardEvent,
   LayoutAnimation,
+  LayoutAnimationProperty,
   Platform,
   StyleSheet,
   View,
 } from 'react-native';
 import {KeyboardListener} from '..';
-import {ProviderChat} from './Provider';
+import {IProviderChat} from './Provider';
 interface IViewKeyboardProps {
   backgroundColor?: string;
   keyboardDistance?: number;
   inputToolbar?: any;
   onShowKeyboard?: any;
   onHideKeyboard?: any;
+  provider: IProviderChat;
 }
 
 interface ISwapView extends IViewKeyboardProps {}
@@ -22,17 +26,18 @@ interface ISwapView extends IViewKeyboardProps {}
 interface IState {
   height: number;
 }
-class ViewKeyboard extends Component<ISwapView, IState> {
+class KeyboardChat extends Component<ISwapView, IState> {
   initApp: any;
   animatedBegin: boolean;
   timeKeyboard: number;
   unsubHideKeyboard: boolean;
   constructor(props: ISwapView) {
     super(props);
-    this.state = {height: bar.bottomHeight};
+    this.state = {height: 0};
     this.animatedBegin = false;
     this.timeKeyboard = 250;
     this.unsubHideKeyboard = false;
+    this.removeBeginLayout = debounce(this.removeBeginLayout, 5);
   }
 
   componentWillUnmount() {
@@ -50,11 +55,12 @@ class ViewKeyboard extends Component<ISwapView, IState> {
   }
 
   onWillShow = (event: KeyboardEvent) => {
+    const {keyboardDistance = 0} = this.props;
     this.unsubHideKeyboard = false;
     const {endCoordinates, duration} = event;
     this.timeKeyboard = duration;
     this.animatedLayout(duration);
-    this.setState({height: endCoordinates.height});
+    this.setState({height: endCoordinates.height - keyboardDistance});
   };
 
   onWillHide = (event: KeyboardEvent) => {
@@ -62,28 +68,32 @@ class ViewKeyboard extends Component<ISwapView, IState> {
       const {duration} = event;
       this.timeKeyboard = duration;
       this.animatedLayout(duration);
-      this.setState({height: bar.bottomHeight});
+      this.setState({height: 0});
     }
+  };
+
+  onDidShow = () => {
+    const {provider} = this.props;
+    provider.toggleImage(0);
   };
 
   removeBeginLayout = () => {
     this.animatedBegin = false;
   };
 
-  animatedLayout = (duration: number) => {
-    if (this.animatedBegin) {
-      return;
+  animatedLayout = (
+    duration: number = 10,
+    type: LayoutAnimationProperty = 'scaleY',
+  ) => {
+    if (!this.animatedBegin) {
+      this.animatedBegin = true;
+      const typeAnimated = Platform.OS === 'ios' ? 'keyboard' : 'easeOut';
+      LayoutAnimation.configureNext(
+        LayoutAnimation.create(duration, typeAnimated, type),
+        this.removeBeginLayout,
+        this.removeBeginLayout,
+      );
     }
-    this.animatedBegin = true;
-    LayoutAnimation.configureNext(
-      LayoutAnimation.create(
-        Platform.OS === 'ios' ? duration : 10,
-        Platform.OS === 'ios' ? 'keyboard' : 'easeOut',
-        'scaleY',
-      ),
-      this.removeBeginLayout,
-      this.removeBeginLayout,
-    );
   };
 
   toggleKeyboard = (h: number = bar.bottomHeight) => {
@@ -103,23 +113,26 @@ class ViewKeyboard extends Component<ISwapView, IState> {
   render() {
     const {height} = this.state;
     return (
-      <ProviderChat.Consumer>
-        {({toggleImage}) => (
-          <View style={[styles.view, {height}]}>
-            <KeyboardListener
-              onWillShow={this.onWillShow}
-              onWillHide={this.onWillHide}
-              onDidShow={() => toggleImage(0)}
-            />
-          </View>
-        )}
-      </ProviderChat.Consumer>
+      <View style={[styles.view, {minHeight: height}]}>
+        <TextInput style={styles.input} multiline />
+        <KeyboardListener
+          onWillShow={this.onWillShow}
+          onWillHide={this.onWillHide}
+          onDidShow={this.onDidShow}
+        />
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  view: {width: '100%'},
+  view: {
+    flexGrow: 1,
+  },
+  input: {
+    height: 40,
+    backgroundColor: '#e3e3e3',
+  },
 });
 
-export default ViewKeyboard;
+export default KeyboardChat;

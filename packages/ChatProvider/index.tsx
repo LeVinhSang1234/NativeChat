@@ -1,7 +1,5 @@
-import InputChat from '@/Chat/InputChat';
 import ModalCamera from '@/Chat/ModalCamera';
 import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
-import {BlurView} from '@react-native-community/blur';
 import React, {Component} from 'react';
 import {
   View,
@@ -12,12 +10,12 @@ import {
 } from 'react-native';
 import {ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
-import ViewKeyboard from './ViewKeyboard';
+import KeyboardChat from './KeyboardChat';
+import {BlurView} from '@react-native-community/blur';
 
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
   'ColorPropType will be removed',
-  'Overriding previous layout animation',
 ]);
 
 export declare type IChatProviderProps = {
@@ -40,7 +38,7 @@ interface IPropsChatSwap extends IChatProviderProps {
 class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   timeout?: NodeJS.Timeout;
   modalCamera?: ModalCamera | null;
-  viewKeyboard?: ViewKeyboard | null;
+  viewKeyboard?: KeyboardChat | null;
   styleIcon: ITheme;
   constructor(props: IPropsChatSwap) {
     super(props);
@@ -107,12 +105,10 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       <ProviderChat.Provider value={provider}>
         <View style={styles.view} onLayout={this.handleLayout}>
           {loading ? null : children}
-          <BlurView blurType={colorScheme}>
-            <InputChat />
-            <ViewKeyboard
-              ref={ref => {
-                this.viewKeyboard = ref;
-              }}
+          <BlurView>
+            <KeyboardChat
+              provider={provider}
+              ref={ref => (this.viewKeyboard = ref)}
               keyboardDistance={keyboardDistance}
             />
           </BlurView>
@@ -129,7 +125,7 @@ const ChatProvider = (props: IChatProviderProps) => {
 };
 
 const styles = StyleSheet.create({
-  view: {flex: 1},
+  view: {flexGrow: 1},
 });
 
 export default ChatProvider;

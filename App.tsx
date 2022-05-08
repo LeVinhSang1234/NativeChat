@@ -1,12 +1,15 @@
 import Chat from '@/Chat';
 import React from 'react';
+import {SafeAreaView} from 'react-native';
 import ChatProvider from './packages/ChatProvider';
 
 const App = () => {
   return (
-    <ChatProvider>
-      <Chat user={{_id: 1}} />
-    </ChatProvider>
+    <SafeAreaView style={{flex: 1}}>
+      <ChatProvider>
+        <Chat user={{_id: 1}} />
+      </ChatProvider>
+    </SafeAreaView>
   );
 };
 

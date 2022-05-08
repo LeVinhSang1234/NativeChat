@@ -1,10 +1,5 @@
-import {
-  IProviderChat,
-  ProviderChat,
-  useProviderChat,
-} from '@/ChatProvider/Provider';
+import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
 import {IconIon, throwException} from '@/utils';
-import {BlurView} from '@react-native-community/blur';
 import React, {Component, ReactNode, Suspense} from 'react';
 import {
   GestureResponderEvent,
@@ -22,6 +17,7 @@ import FocusPoint from './FocusPoint';
 import TabClickHandle from './TabClickHandle';
 import {backgroundIconChat, backgroundIconChatDark} from '@/utils/variables';
 import bar from '@/utils/bar';
+import BlurView from '../BlurView';
 
 const ImageCapture = React.lazy(() => import('./ImageCapture'));
 
@@ -189,45 +185,50 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
       yPoint,
       permission,
     } = this.state;
-    const {width, height, saveText, sendText, colorScheme, theme} = this.props;
+    const {
+      width,
+      height,
+      saveText,
+      sendText,
+      colorScheme,
+      theme,
+      toggleCamera,
+    } = this.props;
     const {textLibrary} = theme;
     if (!open) {
       return null;
     }
     if (permission === RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
       const colorIcon = colorScheme === 'light' ? '#000' : '#fff';
-      const colorSetting =
-        colorScheme === 'light' ? backgroundIconChat : backgroundIconChatDark;
       return (
-        <ProviderChat.Consumer>
-          {({toggleCamera}) => (
-            <BlurView blurType={colorScheme} style={styles.blurViewAuth}>
-              <Pressable
-                onPress={() => {
-                  this.close();
-                  toggleCamera(false);
-                }}
-                style={styles.iconClose}>
-                <IconIon name="ios-close" size={30} color={colorIcon} />
-              </Pressable>
-              <View>
-                <Text style={styles.textPermission}>
-                  {textLibrary?.CameraPermission}
-                </Text>
-                <Text style={styles.textPermissionDescription}>
-                  {textLibrary?.CameraPermissionDescription}
-                </Text>
-                <Pressable
-                  style={styles.openSetting}
-                  onPress={() => Linking.openSettings()}>
-                  <Text style={[styles.textOpenSeting, {color: colorSetting}]}>
-                    {textLibrary?.openSettingApp}
-                  </Text>
-                </Pressable>
-              </View>
-            </BlurView>
-          )}
-        </ProviderChat.Consumer>
+        <BlurView style={styles.blurViewAuth}>
+          <Pressable
+            onPress={() => {
+              this.close();
+              toggleCamera(false);
+            }}
+            style={styles.iconClose}>
+            <IconIon name="ios-close" size={30} color={colorIcon} />
+          </Pressable>
+          <View>
+            <Text style={styles.textPermission}>
+              {textLibrary?.CameraPermission}
+            </Text>
+            <Text style={styles.textPermissionDescription}>
+              {textLibrary?.CameraPermissionDescription}
+            </Text>
+            <Pressable
+              style={styles.openSetting}
+              onPress={() => Linking.openSettings()}>
+              <Text
+                style={styles.textOpenSeting}
+                colorModeDark={backgroundIconChatDark}
+                colorModeLight={backgroundIconChat}>
+                {textLibrary?.openSettingApp}
+              </Text>
+            </Pressable>
+          </View>
+        </BlurView>
       );
     }
     if (image) {
@@ -243,47 +244,43 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
       );
     }
     return (
-      <ProviderChat.Consumer>
-        {({toggleCamera}) => (
-          <TabClickHandle
-            onMove={this.handleMove}
-            onDoubleTab={this.handleChangeType}
-            onTab={this.handlePress}>
-            <RNCamera
-              onStatusChange={this.handleStatusCamera}
-              useNativeZoom
-              exposure={exposure}
-              zoom={zoom}
-              autoFocus={RNCamera.Constants.AutoFocus.off}
-              autoFocusPointOfInterest={this.renderAutoFocus()}
-              style={{width: width, height: height}}
-              ref={ref => (this.camera = ref)}
-              captureAudio={false}
-              type={typeCamera}
-              flashMode={flashMode}
-              onCameraReady={this.handleReadyCamera}
-            />
-            <ActionTop
-              flashMode={flashMode}
-              onClose={() => {
-                this.close();
-                toggleCamera(false);
-              }}
-              onChangeFlash={this.handleChangeFlash}
-              onChangeType={this.handleChangeType}
-            />
-            <ActionBottom takePicture={this.takePicture} />
-            <FocusPoint
-              ref={(ref: FocusPoint) => {
-                this.focusPoint = ref;
-              }}
-              exposure={exposure}
-              xPoint={xPoint}
-              yPoint={yPoint}
-            />
-          </TabClickHandle>
-        )}
-      </ProviderChat.Consumer>
+      <TabClickHandle
+        onMove={this.handleMove}
+        onDoubleTab={this.handleChangeType}
+        onTab={this.handlePress}>
+        <RNCamera
+          onStatusChange={this.handleStatusCamera}
+          useNativeZoom
+          exposure={exposure}
+          zoom={zoom}
+          autoFocus={RNCamera.Constants.AutoFocus.off}
+          autoFocusPointOfInterest={this.renderAutoFocus()}
+          style={{width: width, height: height}}
+          ref={ref => (this.camera = ref)}
+          captureAudio={false}
+          type={typeCamera}
+          flashMode={flashMode}
+          onCameraReady={this.handleReadyCamera}
+        />
+        <ActionTop
+          flashMode={flashMode}
+          onClose={() => {
+            this.close();
+            toggleCamera(false);
+          }}
+          onChangeFlash={this.handleChangeFlash}
+          onChangeType={this.handleChangeType}
+        />
+        <ActionBottom takePicture={this.takePicture} />
+        <FocusPoint
+          ref={(ref: FocusPoint) => {
+            this.focusPoint = ref;
+          }}
+          exposure={exposure}
+          xPoint={xPoint}
+          yPoint={yPoint}
+        />
+      </TabClickHandle>
     );
   }
 }
