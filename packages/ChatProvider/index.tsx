@@ -16,6 +16,7 @@ import KeyboardChat from '../Chat/KeyboardChat';
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
   'ColorPropType will be removed',
+  'Overriding previous layout animation with new one before',
 ]);
 
 export declare type IChatProviderProps = {

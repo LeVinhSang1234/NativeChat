@@ -31,7 +31,7 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
     super(props);
     const {provider} = props;
     this.state = {width: provider.width - 187, value: ''};
-    this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
+    this.removeBeginLayout = debounce(this.removeBeginLayout, 15);
   }
 
   removeBeginLayout = () => {
@@ -40,7 +40,7 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
 
   animatedLayout = (
     duration: number = 10,
-    type: LayoutAnimationProperty = 'scaleY',
+    type: LayoutAnimationProperty = 'opacity',
   ) => {
     if (!this.animatedBegin) {
       this.animatedBegin = true;
@@ -82,6 +82,10 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
     this.setState({value: text});
   };
 
+  onContentChangeSize = () => {
+    this.animatedLayout();
+  };
+
   render() {
     const {width, value} = this.state;
     const {provider} = this.props;
@@ -94,6 +98,7 @@ class SwapInputChat extends Component<ISwapInputProps, IState> {
           ref={ref => (this.extension = ref)}
         />
         <TextInput
+          onContentSizeChange={this.onContentChangeSize}
           onBlur={this.handleBlurInput}
           onPressIn={this.handlePressInput}
           onChangeText={this.handleChangeText}

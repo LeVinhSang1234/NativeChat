@@ -1,3 +1,4 @@
+import {ProviderChat} from '@/ChatProvider/Provider';
 import {IconIon} from '@/utils';
 import {backgroundIconChat} from '@/utils/variables';
 import React, {Component} from 'react';
@@ -25,22 +26,30 @@ class Extension extends Component<IProps, IState> {
     const {visibleChevron} = this.state;
     const {handleBlurInput} = this.props;
     return (
-      <View style={styles.view}>
-        <Pressable style={styles.pressable}>
-          <IconIon style={styles.iconCamera} name="camera" />
-        </Pressable>
-        <Pressable style={styles.pressable}>
-          <IconIon style={styles.iconImage} name="image" />
-        </Pressable>
-        <Pressable style={styles.pressable}>
-          <IconIon style={styles.iconImage} name="mic" />
-        </Pressable>
-        {visibleChevron ? (
-          <Pressable style={styles.pressableChevron} onPress={handleBlurInput}>
-            <IconIon style={styles.iconImage} name="chevron-forward" />
-          </Pressable>
-        ) : null}
-      </View>
+      <ProviderChat.Consumer>
+        {({toggleCamera}) => (
+          <View style={styles.view}>
+            <Pressable
+              style={styles.pressable}
+              onPress={() => toggleCamera(true)}>
+              <IconIon style={styles.iconCamera} name="camera" />
+            </Pressable>
+            <Pressable style={styles.pressable}>
+              <IconIon style={styles.iconImage} name="image" />
+            </Pressable>
+            <Pressable style={styles.pressable}>
+              <IconIon style={styles.iconImage} name="mic" />
+            </Pressable>
+            {visibleChevron ? (
+              <Pressable
+                style={styles.pressableChevron}
+                onPress={handleBlurInput}>
+                <IconIon style={styles.iconImage} name="chevron-forward" />
+              </Pressable>
+            ) : null}
+          </View>
+        )}
+      </ProviderChat.Consumer>
     );
   }
 }
