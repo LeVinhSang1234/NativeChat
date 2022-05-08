@@ -103,10 +103,9 @@ class SwapChat extends Component<ISwapChatProps> {
                   <TextInput style={styles.input} />
                 </Form.Item>
                 <Button
-                  onPress={() => {
-                    form.validateFields((err, values) => {
-                      console.log(values, err);
-                    });
+                  onPress={async () => {
+                    const data = await form.validateFields();
+                    console.log(data);
                   }}
                   title="asdasdsas"
                 />

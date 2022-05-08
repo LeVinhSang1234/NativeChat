@@ -179,7 +179,7 @@ class Form extends Component<IFormProps> {
   };
 
   validateFields = async (
-    calback: (err?: IErrorForm[], v?: IValueForm) => any,
+    calback?: (err?: IErrorForm[], v?: IValueForm) => any,
     custom?: {fields?: string[]; excepts?: string[]},
     uid: string = uuid,
   ) => {
@@ -211,9 +211,10 @@ class Form extends Component<IFormProps> {
     if (!errorArr.length) {
       errorArr = undefined;
     }
-    if (calback && typeof calback === 'function') {
+    if (typeof calback === 'function') {
       calback(errorArr, formControl[uid].value);
     }
+    return {errors: errorArr, values: formControl[uid].value};
   };
 
   setFieldError = (field: string, error?: string, uid: string = uuid) => {
@@ -299,7 +300,7 @@ Form.useForm = (): IFormHandle & {uid: string} => {
       return handleForm.getFieldsValue(uid);
     },
     validateFields: (
-      calback: (err?: IErrorForm, values?: IValueForm) => any,
+      calback?: (err?: IErrorForm, values?: IValueForm) => any,
       data?: {fields?: string[]; excepts?: string[]},
     ) => {
       return handleForm.validateFields(calback, data, uid);

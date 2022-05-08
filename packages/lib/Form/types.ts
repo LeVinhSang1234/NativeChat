@@ -56,9 +56,9 @@ export declare type IFormHandle = {
   getFieldValue: (field: string) => any;
   getFieldsValue: () => any;
   validateFields: (
-    calback: (err?: IErrorForm, values?: IValueForm) => any,
+    calback?: (err?: IErrorForm, values?: IValueForm) => any,
     data?: {fields?: string[]; excepts?: string[]},
-  ) => Promise<any>;
+  ) => Promise<{errors: {[key: string]: any}; values: {[key: string]: any}}>;
   resetFields: (fields?: any, errors?: any) => void;
   setFieldError: (field: string, error?: any) => void;
   getTouched: (field?: string) => any;
@@ -75,7 +75,7 @@ export interface IFormHandleRemap {
   getFieldValue: (field: string, uid?: string) => any;
   getFieldsValue: (uid?: string) => any;
   validateFields: (
-    calback: (err?: IErrorForm, values?: IValueForm) => any,
+    calback?: (err?: IErrorForm, values?: IValueForm) => any,
     data?: {fields?: string[]; excepts?: string[]},
     uid?: string,
   ) => Promise<any>;
