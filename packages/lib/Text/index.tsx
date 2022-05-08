@@ -1,5 +1,10 @@
 import React from 'react';
-import {Text as TextLibrary, TextProps, useColorScheme} from 'react-native';
+import {
+  PlatformColor,
+  Text as TextLibrary,
+  TextProps,
+  useColorScheme,
+} from 'react-native';
 
 function Text(
   props: TextProps & {colorModeDark?: string; colorModeLight?: string},
@@ -7,12 +12,12 @@ function Text(
   const {
     children,
     style,
-    colorModeDark = '#fff',
-    colorModeLight = '#000',
+    colorModeDark = PlatformColor?.('label') || '#fff',
+    colorModeLight = PlatformColor?.('label') || '#000',
   } = props;
   const colorScheme = useColorScheme();
   let colorText = colorModeDark;
-  if (colorScheme === 'dark') {
+  if (colorScheme === 'light') {
     colorText = colorModeLight;
   }
   return (

@@ -1,10 +1,8 @@
 import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
 import {theme} from '@/ChatProvider/theme';
-import {IFormHandle} from '@/lib/Form/types';
-import TextInput from '@/lib/TextInput';
+import Text from '@/lib/Text';
 import React, {Component} from 'react';
 import {
-  Button,
   ImageBackground,
   Keyboard,
   Pressable,
@@ -12,7 +10,6 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {Form} from '..';
 
 export declare type IChatProps = {
   user: {
@@ -24,7 +21,6 @@ export declare type IChatProps = {
 
 interface ISwapChatProps extends IChatProps {
   provider: IProviderChat;
-  form: IFormHandle;
 }
 
 class SwapChat extends Component<ISwapChatProps> {
@@ -65,7 +61,6 @@ class SwapChat extends Component<ISwapChatProps> {
   };
 
   render() {
-    const {form} = this.props;
     return (
       <View style={styles.view} removeClippedSubviews>
         <ScrollView
@@ -84,32 +79,12 @@ class SwapChat extends Component<ISwapChatProps> {
               style={{
                 backgroundColor: theme.chatBody?.backgroundColor,
               }}>
-              <Form>
-                <Form.Item
-                  name="name"
-                  rule={{
-                    required: true,
-                  }}>
-                  <TextInput style={styles.input} />
-                </Form.Item>
-                <Form.Item
-                  name="name2"
-                  rule={{
-                    required: true,
-                  }}>
-                  <TextInput style={styles.input} />
-                </Form.Item>
-                <Form.Item name="name3">
-                  <TextInput style={styles.input} />
-                </Form.Item>
-                <Button
-                  onPress={async () => {
-                    const data = await form.validateFields();
-                    console.log(data);
-                  }}
-                  title="asdasdsas"
-                />
-              </Form>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
+              <Text>Sang</Text>
             </ImageBackground>
           </Pressable>
         </ScrollView>
@@ -120,8 +95,7 @@ class SwapChat extends Component<ISwapChatProps> {
 
 const Chat = React.forwardRef((props: IChatProps, ref: any) => {
   const value = useProviderChat();
-  const form = Form.useForm();
-  return <SwapChat {...props} provider={value} ref={ref} form={form} />;
+  return <SwapChat {...props} provider={value} ref={ref} />;
 });
 
 const styles = StyleSheet.create({
@@ -130,7 +104,7 @@ const styles = StyleSheet.create({
     transform: [{scaleY: -1}],
   },
   scrollView: {
-    flex: 1,
+    flexGrow: 1,
     overflow: 'visible',
   },
   contentPress: {
