@@ -8,9 +8,6 @@ export declare type IProviderChat = {
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
-  toggleKeyboard: (_h: number) => any;
-  toggleImage: (_h?: number) => any;
-  getHeightKeyboadOpening: () => number;
 };
 
 export declare type IImagePickerProvider = {
@@ -22,9 +19,6 @@ const initValue: IProviderChat = {
   width: Dimensions.get('screen').width,
   height: Dimensions.get('screen').height,
   toggleCamera: (_flag: boolean) => null,
-  toggleKeyboard: (_h: number) => null,
-  toggleImage: (_h?: number) => null,
-  getHeightKeyboadOpening: () => 0,
   theme,
   colorScheme: 'light',
 };
