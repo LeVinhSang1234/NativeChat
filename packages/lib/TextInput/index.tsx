@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
 import {
+  Animated,
   TextInput as InputLibrary,
   TextInputProps,
   useColorScheme,
 } from 'react-native';
 
-const TextInputFunc = React.forwardRef((props: TextInputProps, ref: any) => {
+const TextInput = React.forwardRef((props: TextInputProps, ref: any) => {
   const {style, value, children, ...p} = props;
   const colorScheme = useColorScheme();
   let colorText;
@@ -23,10 +24,14 @@ const TextInputFunc = React.forwardRef((props: TextInputProps, ref: any) => {
   );
 });
 
-class TextInput extends Component<TextInputProps> {
+class TextInputComponent extends Component<TextInputProps> {
   render() {
-    return <TextInputFunc {...this.props} />;
+    return <TextInput {...this.props} />;
   }
 }
+
+const TextInputAnimated = Animated.createAnimatedComponent(TextInputComponent);
+
+export {TextInputAnimated};
 
 export default TextInput;

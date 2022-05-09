@@ -1,4 +1,5 @@
 import ModalCamera from '@/Chat/ModalCamera';
+import ViewInput from '@/Chat/ViewInput';
 import React, {Component} from 'react';
 import {
   View,
@@ -73,6 +74,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       <ProviderChat.Provider value={provider}>
         <View style={[styles.view, style]} onLayout={this.handleLayout}>
           {loading ? null : children}
+          <ViewInput />
           <ModalCamera ref={ref => (this.modalCamera = ref)} />
         </View>
       </ProviderChat.Provider>

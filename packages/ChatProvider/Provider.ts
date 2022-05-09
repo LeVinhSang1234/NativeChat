@@ -1,5 +1,5 @@
 import {createContext, useContext} from 'react';
-import {Dimensions} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 import {ITheme, theme} from './theme';
 
 export declare type IProviderChat = {
@@ -8,6 +8,15 @@ export declare type IProviderChat = {
   theme: ITheme;
   colorScheme: 'light' | 'dark';
   toggleCamera: (_flag: boolean) => any;
+};
+
+export declare type IKeyboardProvider = {
+  openKeyboard: () => any;
+  removeKeyboard: () => any;
+  keyboardHeight: number;
+  keyboardHeightSystem: number;
+  isKeyboardOpen: boolean;
+  durationKeyboard: number;
 };
 
 export declare type IImagePickerProvider = {
@@ -25,13 +34,27 @@ const initValue: IProviderChat = {
 
 const initImagePicker: IImagePickerProvider = {};
 
+const initialValueKeyboard: IKeyboardProvider = {
+  keyboardHeight: 250,
+  keyboardHeightSystem: 250,
+  isKeyboardOpen: false,
+  openKeyboard: () => null,
+  removeKeyboard: () => null,
+  durationKeyboard: Platform.select({ios: 250, default: 10}),
+};
+
 export const ProviderChat = createContext(initValue);
-export const ImagePickerProvider = createContext(initImagePicker);
+export const ProviderImagePicker = createContext(initImagePicker);
+export const ProviderKeyboard = createContext(initialValueKeyboard);
 
 export const useProviderChat = () => {
   return useContext(ProviderChat);
 };
 
 export const useProviderImagePicker = () => {
-  return useContext(ImagePickerProvider);
+  return useContext(ProviderImagePicker);
+};
+
+export const useProviderKeyboard = () => {
+  return useContext(ProviderKeyboard);
 };
