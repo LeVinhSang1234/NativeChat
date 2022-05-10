@@ -104,6 +104,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
         <View style={[styles.view, style]} onLayout={this.handleLayout}>
           {loading ? <View style={styles.viewLoading} /> : children}
           <ViewInput
+            heightScreen={height}
             ref={ref => (this.viewInput = ref)}
             colorScheme={colorScheme}
           />

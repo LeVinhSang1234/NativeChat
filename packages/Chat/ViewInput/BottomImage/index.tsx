@@ -2,7 +2,7 @@ import {IKeyboardProvider} from '@/ChatProvider/Provider';
 import Text from '@/lib/Text';
 import {debounce} from '@/utils';
 import bar from '@/utils/bar';
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {
   GestureResponderEvent,
   LayoutAnimation,
@@ -14,14 +14,17 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import FeedBack from 'react-native-haptic-feedback';
 
 export declare type IBottomDragProps = {
   colorScheme: 'light' | 'dark';
   provider: IKeyboardProvider;
+  heightScreen: number;
 };
 
 interface IState {
   height: number;
+  heightBackdrop: number | string;
 }
 
 class BottomImage extends Component<IBottomDragProps, IState> {
@@ -30,12 +33,17 @@ class BottomImage extends Component<IBottomDragProps, IState> {
   YNowPrevious: number;
   constructor(props: IBottomDragProps) {
     super(props);
-    this.state = {height: 0};
+    this.state = {height: 0, heightBackdrop: 0};
     this.YNowPrevious = 0;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
   }
 
   removeBeginLayout = () => {
+    const {heightBackdrop, height} = this.state;
+    const {provider} = this.props;
+    if (heightBackdrop !== 0 && provider.heightStartInit >= height) {
+      this.setState({heightBackdrop: 0});
+    }
     this.animatedBegin = false;
   };
 
@@ -76,8 +84,9 @@ class BottomImage extends Component<IBottomDragProps, IState> {
   };
 
   onResponderMove = (event: GestureResponderEvent) => {
-    const {height} = this.state;
-    if (event.nativeEvent.pageY < bar.topHeight + 60) {
+    const {height, heightBackdrop} = this.state;
+    const {provider, heightScreen} = this.props;
+    if (height > heightScreen - bar.topHeight - 60) {
       return;
     }
     let heightRemove = event.nativeEvent.pageY - this.YNowPrevious;
@@ -85,6 +94,23 @@ class BottomImage extends Component<IBottomDragProps, IState> {
       heightRemove = 0;
     }
     this.YNowPrevious = event.nativeEvent.pageY;
+    if (
+      height - heightRemove <= provider.keyboardHeight ||
+      provider.keyboardHeight <= provider.heightStartInit
+    ) {
+      provider.dragKeyboard(height - heightRemove);
+    }
+    if (
+      height - heightRemove > provider.heightStartInit &&
+      heightBackdrop === 0
+    ) {
+      this.setState({heightBackdrop: '100%'});
+    } else if (
+      heightBackdrop === '100%' &&
+      height - heightRemove <= provider.heightStartInit
+    ) {
+      this.setState({heightBackdrop: 0});
+    }
     this.setState({height: height - heightRemove});
   };
 
@@ -106,39 +132,69 @@ class BottomImage extends Component<IBottomDragProps, IState> {
     }
   };
 
-  onResponderEnd = () => {
+  onResponderEnd = ({nativeEvent}: GestureResponderEvent) => {
+    const {height} = this.state;
+    const {provider, heightScreen} = this.props;
+    if (nativeEvent.pageY > this.YNowPrevious) {
+      if (height >= provider.heightStartInit) {
+        this.setState({height: provider.keyboardHeight});
+      } else {
+        provider.removeKeyboard();
+        this.setState({height: 0});
+      }
+    } else {
+      if (height > provider.keyboardHeight) {
+        FeedBack.trigger('impactHeavy');
+        this.setState({height: heightScreen - bar.topHeight - 60});
+      } else {
+        provider.dragKeyboard(provider.heightStartInit);
+        this.setState({height: provider.heightStartInit});
+      }
+    }
+    this.animatedLayout();
     this.beginDrag = false;
     this.YNowPrevious = 0;
   };
 
   render() {
-    const {height} = this.state;
-    const {colorScheme} = this.props;
-    const shadowColor = colorScheme === 'dark' ? '#fff' : '#000';
-    const backgroundColor = colorScheme === 'dark' ? 'rgba(0,0,0,0.7)' : '#fff';
+    const {height, heightBackdrop} = this.state;
+    const {colorScheme, heightScreen} = this.props;
+    const shadowColor =
+      colorScheme === 'dark' ? 'rgb(255,255,255)' : 'rgb(0,0,0)';
+    const backgroundColor =
+      colorScheme === 'dark' ? '#141414' : 'rgb(255,255,255)';
+    const opacity = height / (heightScreen - bar.topHeight - 60) - 0.3;
 
     return (
-      <View
-        style={[styles.view, {shadowColor, backgroundColor, height}]}
-        onMoveShouldSetResponder={this.onMoveShouldSetResponder}
-        onResponderEnd={this.onResponderEnd}
-        onResponderMove={this.onResponderMove}>
-        <Pressable
-          onTouchEnd={this.onTouchEnd}
-          onPressIn={this.beginDragEvent}
-          style={styles.wrapDrag}>
-          <View style={styles.center}>
-            <View style={[styles.lineDrag]} />
-          </View>
-        </Pressable>
-        <ScrollView
-          onScroll={this.handleScrollView}
-          scrollEventThrottle={0}
-          removeClippedSubviews
-          style={styles.scrollView}>
-          <Text>Snag</Text>
-        </ScrollView>
-      </View>
+      <Fragment>
+        <View
+          style={[
+            styles.viewBackdrop,
+            {opacity: opacity, height: heightBackdrop},
+          ]}
+        />
+        <View
+          style={[styles.view, {shadowColor, backgroundColor, height}]}
+          onMoveShouldSetResponder={this.onMoveShouldSetResponder}
+          onResponderEnd={this.onResponderEnd}
+          onResponderMove={this.onResponderMove}>
+          <Pressable
+            onTouchEnd={this.onTouchEnd}
+            onPressIn={this.beginDragEvent}
+            style={styles.wrapDrag}>
+            <View style={styles.center}>
+              <View style={[styles.lineDrag]} />
+            </View>
+          </Pressable>
+          <ScrollView
+            onScroll={this.handleScrollView}
+            scrollEventThrottle={0}
+            removeClippedSubviews
+            style={styles.scrollView}>
+            <Text>Snag</Text>
+          </ScrollView>
+        </View>
+      </Fragment>
     );
   }
 }
@@ -177,6 +233,11 @@ const styles = StyleSheet.create({
   scrollView: {
     paddingHorizontal: 8,
     paddingBottom: bar.bottomHeight + 10,
+  },
+  viewBackdrop: {
+    position: 'absolute',
+    backgroundColor: '#000',
+    width: '100%',
   },
 });
 

@@ -22,8 +22,10 @@ export declare type IProviderChat = {
 export declare type IKeyboardProvider = {
   openKeyboard: () => any;
   removeKeyboard: () => any;
+  dragKeyboard: (h: number) => any;
   keyboardHeight: number;
   keyboardHeightSystem: number;
+  heightStartInit: number;
   isKeyboardOpen: boolean;
   durationKeyboard: number;
 };
@@ -58,9 +60,11 @@ const initImagePicker: IImagePickerProvider = {};
 const initialValueKeyboard: IKeyboardProvider = {
   keyboardHeight: 250,
   keyboardHeightSystem: 250,
+  heightStartInit: 0,
   isKeyboardOpen: false,
   openKeyboard: () => null,
   removeKeyboard: () => null,
+  dragKeyboard: (_h: number) => null,
   durationKeyboard: Platform.select({ios: 250, default: 10}),
 };
 

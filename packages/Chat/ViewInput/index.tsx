@@ -17,6 +17,7 @@ import InputChat from './InputChat';
 
 interface IProps {
   colorScheme: 'light' | 'dark';
+  heightScreen: number;
 }
 
 interface IState {
@@ -24,6 +25,7 @@ interface IState {
   duration: number;
   heightInput: number;
   keyboardHeightSystem: number;
+  heightStartInit: number;
   isKeyboardOpen: boolean;
 }
 
@@ -39,19 +41,28 @@ class ViewInput extends Component<IProps, IState> {
       isKeyboardOpen: false,
       duration: Platform.select({ios: 250, default: 10}),
       heightInput: 0,
+      heightStartInit: 0,
     };
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
   }
 
   shouldComponentUpdate(nProps: IProps, nState: IState) {
-    const {height, keyboardHeightSystem, isKeyboardOpen, duration} = this.state;
-    const {colorScheme} = this.props;
+    const {
+      height,
+      keyboardHeightSystem,
+      isKeyboardOpen,
+      duration,
+      heightStartInit,
+    } = this.state;
+    const {colorScheme, heightScreen} = this.props;
     return (
       height !== nState.height ||
       isKeyboardOpen !== nState.isKeyboardOpen ||
+      heightStartInit !== nState.heightStartInit ||
       duration !== nState.duration ||
       keyboardHeightSystem !== nState.keyboardHeightSystem ||
-      colorScheme !== nProps.colorScheme
+      colorScheme !== nProps.colorScheme ||
+      heightScreen !== nProps.heightScreen
     );
   }
 
@@ -82,7 +93,11 @@ class ViewInput extends Component<IProps, IState> {
     if (keyboardHeightSystem === 0) {
       this.setState({keyboardHeightSystem: endCoordinates.height});
     }
-    this.setState({height: endCoordinates.height, isKeyboardOpen: true});
+    this.setState({
+      height: endCoordinates.height,
+      isKeyboardOpen: true,
+      heightStartInit: endCoordinates.height,
+    });
   };
 
   onWillHideKB = ({duration}: KeyboardEvent) => {
@@ -103,8 +118,19 @@ class ViewInput extends Component<IProps, IState> {
     if (isKeyboardOpen) {
       Keyboard.dismiss();
     } else {
-      this.setState({height: keyboardHeightSystem || 250});
+      this.setState({
+        height: keyboardHeightSystem || 250,
+        heightStartInit: keyboardHeightSystem || 250,
+      });
     }
+  };
+
+  dragKeyboard = (h: number) => {
+    const {heightStartInit} = this.state;
+    if (h > heightStartInit) {
+      return;
+    }
+    this.setState({height: h});
   };
 
   removeKeyboard = () => {
@@ -136,15 +162,23 @@ class ViewInput extends Component<IProps, IState> {
   };
 
   render() {
-    const {height, keyboardHeightSystem, isKeyboardOpen, duration} = this.state;
-    const {colorScheme} = this.props;
+    const {
+      height,
+      keyboardHeightSystem,
+      isKeyboardOpen,
+      duration,
+      heightStartInit,
+    } = this.state;
+    const {colorScheme, heightScreen} = this.props;
     const providerValue = {
       keyboardHeightSystem: keyboardHeightSystem || 250,
       isKeyboardOpen,
       durationKeyboard: duration,
       keyboardHeight: height,
+      heightStartInit: heightStartInit,
       openKeyboard: this.openKeyboard,
       removeKeyboard: this.removeKeyboard,
+      dragKeyboard: this.dragKeyboard,
     };
     return (
       <ProviderKeyboard.Provider value={providerValue}>
@@ -167,6 +201,7 @@ class ViewInput extends Component<IProps, IState> {
           />
         </BlurView>
         <BottomImage
+          heightScreen={heightScreen}
           ref={ref => (this.bottomImage = ref)}
           provider={providerValue}
           colorScheme={colorScheme}
