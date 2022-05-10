@@ -8,6 +8,7 @@ interface IProps {
   handleBlurInput: () => any;
   provider: IProviderChat;
   visibleChevron: boolean;
+  openImageSelect: (f: boolean) => any;
 }
 
 interface IState {}
@@ -24,7 +25,8 @@ class Extension extends Component<IProps, IState> {
   }
 
   render() {
-    const {handleBlurInput, provider, visibleChevron} = this.props;
+    const {handleBlurInput, provider, visibleChevron, openImageSelect} =
+      this.props;
     return (
       <View style={styles.view}>
         <Pressable
@@ -32,7 +34,9 @@ class Extension extends Component<IProps, IState> {
           onPress={() => provider.toggleCamera(true)}>
           <IconIon style={styles.iconCamera} name="camera" />
         </Pressable>
-        <Pressable style={styles.pressable}>
+        <Pressable
+          style={styles.pressable}
+          onPress={() => openImageSelect(true)}>
           <IconIon style={styles.iconImage} name="image" />
         </Pressable>
         <Pressable style={styles.pressable}>

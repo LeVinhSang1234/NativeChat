@@ -7,7 +7,16 @@ export declare type IProviderChat = {
   height: number;
   theme: ITheme;
   colorScheme: 'light' | 'dark';
-  toggleCamera: (_flag: boolean) => any;
+  toggleCamera: (flag: boolean) => any;
+  removeKeyboard: () => any;
+  isOpenKeyboard: () => {
+    heightKeyboard: number;
+    duration: number;
+    keyboardHeightSystem: number;
+    isKeyboardOpen: boolean;
+    heightInput: number;
+  };
+  type: 'portrait' | 'landscape';
 };
 
 export declare type IKeyboardProvider = {
@@ -30,6 +39,18 @@ const initValue: IProviderChat = {
   toggleCamera: (_flag: boolean) => null,
   theme,
   colorScheme: 'light',
+  type:
+    Dimensions.get('screen').width > Dimensions.get('screen').height
+      ? 'landscape'
+      : 'portrait',
+  removeKeyboard: () => null,
+  isOpenKeyboard: () => ({
+    heightKeyboard: 0,
+    duration: 0,
+    keyboardHeightSystem: 250,
+    isKeyboardOpen: false,
+    heightInput: 0,
+  }),
 };
 
 const initImagePicker: IImagePickerProvider = {};

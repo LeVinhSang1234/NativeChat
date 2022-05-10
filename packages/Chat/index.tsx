@@ -1,8 +1,14 @@
-import {IProviderChat} from '@/ChatProvider/Provider';
+import {IProviderChat, useProviderChat} from '@/ChatProvider/Provider';
 import {theme} from '@/ChatProvider/theme';
 import Text from '@/lib/Text';
 import React, {Component} from 'react';
-import {ImageBackground, Pressable, ScrollView, StyleSheet} from 'react-native';
+import {
+  GestureResponderEvent,
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import {BlurView} from '..';
 
 export declare type IChatProps = {
@@ -13,26 +19,33 @@ export declare type IChatProps = {
   avatar_url_failback?: string;
 };
 
-interface ISwapChatProps extends IChatProps {
-  provider: IProviderChat;
-}
+interface IState {}
 
-class Chat extends Component<ISwapChatProps> {
-  isMoveScroll: boolean;
-
-  constructor(props: ISwapChatProps) {
-    super(props);
-    this.isMoveScroll = false;
-  }
+class WrapChat extends Component<
+  IChatProps & {provider: IProviderChat},
+  IState
+> {
+  onResponderMove = ({nativeEvent}: GestureResponderEvent) => {
+    const {provider} = this.props;
+    const {height, isOpenKeyboard} = provider;
+    const {heightKeyboard, heightInput} = isOpenKeyboard();
+    if (height - nativeEvent.pageY <= heightKeyboard + heightInput) {
+      const {removeKeyboard} = provider;
+      removeKeyboard();
+    }
+  };
 
   render() {
+    const {provider} = this.props;
+    const {height, removeKeyboard} = provider;
     return (
-      <BlurView style={styles.view}>
+      <BlurView style={[styles.view, {height}]}>
         <ScrollView
           removeClippedSubviews
           style={styles.scrollView}
+          onResponderMove={this.onResponderMove}
           contentContainerStyle={styles.contentStyle}>
-          <Pressable style={styles.contentPress}>
+          <Pressable style={styles.contentPress} onPress={removeKeyboard}>
             <ImageBackground
               source={{uri: theme.chatBody?.imageBackground?.uri}}
               style={{
@@ -47,6 +60,11 @@ class Chat extends Component<ISwapChatProps> {
   }
 }
 
+const Chat = React.forwardRef((props: IChatProps, ref: any) => {
+  const provider = useProviderChat();
+  return <WrapChat {...props} provider={provider} ref={ref} />;
+});
+
 const styles = StyleSheet.create({
   view: {
     flex: 1,
@@ -55,6 +73,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     overflow: 'visible',
+    flexGrow: 1,
   },
   contentPress: {
     transform: [{scaleY: -1}],

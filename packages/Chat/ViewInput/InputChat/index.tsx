@@ -17,6 +17,7 @@ import Extension from '../Extension';
 
 interface InputChatProps {
   provider: IProviderChat;
+  openImageSelect: (f: boolean) => any;
 }
 
 interface IState {
@@ -108,13 +109,14 @@ class InputChat extends Component<InputChatProps, IState> {
       light: {backgroundColor: backgroundChatLight},
       dark: {backgroundColor: backgroundChatDark, color: '#fff'},
     };
-    const {provider} = this.props;
+    const {provider, openImageSelect} = this.props;
     const {open, height, value: valueInput, editable} = this.state;
     return (
       <View style={styles.avoidingView}>
         <ProviderChat.Consumer>
           {value => (
             <Extension
+              openImageSelect={openImageSelect}
               visibleChevron={open}
               provider={value}
               handleBlurInput={this.blurInput}

@@ -8,9 +8,17 @@ import {
   useColorScheme,
   LogBox,
   ViewStyle,
+  Platform,
+  UIManager,
 } from 'react-native';
-import {ProviderChat} from './Provider';
+import {IProviderChat, ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
+
+if (Platform.OS === 'android') {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 
 LogBox.ignoreLogs([
   'ViewPropTypes will be removed',
@@ -38,9 +46,9 @@ interface IPropsChatSwap extends IChatProviderProps {
 class SwapChatProvider extends Component<IPropsChatSwap, IState> {
   timeout?: NodeJS.Timeout;
   modalCamera?: ModalCamera | null;
+  viewInput?: ViewInput | null;
   constructor(props: IPropsChatSwap) {
     super(props);
-
     this.state = {
       loading: true,
       width: Dimensions.get('screen').width,
@@ -59,22 +67,46 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
     this.modalCamera?.toggleVisible?.(flag);
   };
 
+  removeKeyboard = () => {
+    this.viewInput?.removeKeyboard?.();
+  };
+
+  isOpenKeyboard = () => {
+    return (
+      this.viewInput?.getState?.() || {
+        heightKeyboard: 0,
+        duration: 0,
+        keyboardHeightSystem: 250,
+        isKeyboardOpen: false,
+        heightInput: 0,
+      }
+    );
+  };
+
   render() {
     const {children, colorScheme, style} = this.props;
     const {loading, width, height, theme: themeState} = this.state;
-    const provider = {
+    const type: 'landscape' | 'portrait' =
+      width > height ? 'landscape' : 'portrait';
+    const provider: IProviderChat = {
       width,
       height,
       toggleCamera: this.toggleCamera,
+      removeKeyboard: this.removeKeyboard,
       theme: {...theme, ...themeState},
       colorScheme,
+      type,
+      isOpenKeyboard: this.isOpenKeyboard,
     };
 
     return (
       <ProviderChat.Provider value={provider}>
         <View style={[styles.view, style]} onLayout={this.handleLayout}>
-          {loading ? null : children}
-          <ViewInput />
+          {loading ? <View style={styles.viewLoading} /> : children}
+          <ViewInput
+            ref={ref => (this.viewInput = ref)}
+            colorScheme={colorScheme}
+          />
           <ModalCamera ref={ref => (this.modalCamera = ref)} />
         </View>
       </ProviderChat.Provider>
@@ -88,7 +120,8 @@ const ChatProvider = (props: IChatProviderProps) => {
 };
 
 const styles = StyleSheet.create({
-  view: {flexGrow: 1},
+  view: {flex: 1},
+  viewLoading: {flexGrow: 1},
 });
 
 export default ChatProvider;
