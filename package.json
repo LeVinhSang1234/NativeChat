@@ -19,8 +19,7 @@
     "react-native-haptic-feedback": "^1.13.1",
     "react-native-svg": "^12.3.0",
     "react-native-vector-icons": "^9.1.0",
-    "react-native-video": "^5.2.0",
-    "rn-photos-framework": "^1.0.7"
+    "rn-photos-framework": "git+ssh://git@github.com:LeVinhSang1234/rn-photos-framework-fix.git"
   },
   "peerDependencies": {
     "react": "*",
@@ -31,8 +30,7 @@
     "react-native-haptic-feedback": "*",
     "react-native-svg": "*",
     "react-native-vector-icons": "*",
-    "react-native-video": "*",
-    "rn-photos-framework": "*"
+    "rn-photos-framework": "git+ssh://git@github.com:LeVinhSang1234/rn-photos-framework-fix.git"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -5,18 +5,18 @@ import IconSomeWhere from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import OcticonsIcon from 'react-native-vector-icons/Octicons';
 import IconSomeWherePro from 'react-native-vector-icons/FontAwesome5Pro';
-import Video from 'react-native-video';
 import RNConvertPhAsset from 'react-native-convert-ph-asset';
+import RNPhotosFramework from 'rn-photos-framework';
 
 export {
   IconIon,
   IconSomeWhere,
-  Video,
   RNConvertPhAsset,
   MaterialIcons,
   IconSomeWherePro,
   IconEvilIcons,
   OcticonsIcon,
+  RNPhotosFramework,
 };
 
 export async function throwException(e: any) {

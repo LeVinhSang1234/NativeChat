@@ -59,12 +59,16 @@ class InputChat extends Component<InputChatProps, IState> {
     this.animatedBegin = false;
   };
 
-  animatedLayout = (duration: number = 10) => {
+  animatedLayout = () => {
     if (!this.animatedBegin) {
       this.animatedBegin = true;
       const typeAnimated = Platform.OS === 'ios' ? 'keyboard' : 'easeOut';
       LayoutAnimation.configureNext(
-        LayoutAnimation.create(duration, typeAnimated, 'opacity'),
+        LayoutAnimation.create(
+          Platform.OS === 'ios' ? 250 : 10,
+          typeAnimated,
+          'opacity',
+        ),
         this.removeBeginLayout,
         this.removeBeginLayout,
       );

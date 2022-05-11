@@ -4,13 +4,13 @@ import {debounce} from '@/utils';
 import bar from '@/utils/bar';
 import React, {Component, Fragment} from 'react';
 import {
+  FlatList,
   GestureResponderEvent,
   LayoutAnimation,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -47,12 +47,16 @@ class BottomImage extends Component<IBottomDragProps, IState> {
     this.animatedBegin = false;
   };
 
-  animatedLayout = (duration: number = 10) => {
+  animatedLayout = () => {
     if (!this.animatedBegin) {
       this.animatedBegin = true;
       const typeAnimated = Platform.OS === 'ios' ? 'keyboard' : 'easeOut';
       LayoutAnimation.configureNext(
-        LayoutAnimation.create(duration, typeAnimated, 'scaleY'),
+        LayoutAnimation.create(
+          Platform.OS === 'ios' ? 250 : 10,
+          typeAnimated,
+          'scaleY',
+        ),
         this.removeBeginLayout,
         this.removeBeginLayout,
       );
@@ -186,13 +190,19 @@ class BottomImage extends Component<IBottomDragProps, IState> {
               <View style={[styles.lineDrag]} />
             </View>
           </Pressable>
-          <ScrollView
+          <FlatList
+            data={[1]}
+            renderItem={({item}) => {
+              console.log(item);
+
+              return <Text>Sang</Text>;
+            }}
             onScroll={this.handleScrollView}
             scrollEventThrottle={0}
             removeClippedSubviews
             style={styles.scrollView}>
             <Text>Snag</Text>
-          </ScrollView>
+          </FlatList>
         </View>
       </Fragment>
     );

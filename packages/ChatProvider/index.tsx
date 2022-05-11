@@ -11,6 +11,7 @@ import {
   Platform,
   UIManager,
 } from 'react-native';
+import ImageProvider from './ImageProvider';
 import {IProviderChat, ProviderChat} from './Provider';
 import {ITheme, theme} from './theme';
 
@@ -103,12 +104,14 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
       <ProviderChat.Provider value={provider}>
         <View style={[styles.view, style]} onLayout={this.handleLayout}>
           {loading ? <View style={styles.viewLoading} /> : children}
-          <ViewInput
-            heightScreen={height}
-            ref={ref => (this.viewInput = ref)}
-            colorScheme={colorScheme}
-          />
-          <ModalCamera ref={ref => (this.modalCamera = ref)} />
+          <ImageProvider>
+            <ViewInput
+              heightScreen={height}
+              ref={ref => (this.viewInput = ref)}
+              colorScheme={colorScheme}
+            />
+            <ModalCamera ref={ref => (this.modalCamera = ref)} />
+          </ImageProvider>
         </View>
       </ProviderChat.Provider>
     );

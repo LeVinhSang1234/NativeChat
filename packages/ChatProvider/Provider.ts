@@ -33,6 +33,13 @@ export declare type IKeyboardProvider = {
 export declare type IImagePickerProvider = {
   album?: any;
   albums?: any;
+  status: IStatusPhotos;
+  requestAuthorPhotos: () => Promise<IStatusPhotos>;
+};
+
+export declare type IStatusPhotos = {
+  isAuthorized: boolean;
+  status: 'notDetermined' | 'restricted' | 'denied' | 'authorized';
 };
 
 const initValue: IProviderChat = {
@@ -55,7 +62,13 @@ const initValue: IProviderChat = {
   }),
 };
 
-const initImagePicker: IImagePickerProvider = {};
+const initImagePicker: IImagePickerProvider = {
+  albums: [],
+  album: {},
+  status: {isAuthorized: false, status: 'notDetermined'},
+  requestAuthorPhotos: () =>
+    new Promise(res => res({isAuthorized: false, status: 'notDetermined'})),
+};
 
 const initialValueKeyboard: IKeyboardProvider = {
   keyboardHeight: 250,
