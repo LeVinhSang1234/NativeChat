@@ -5,3 +5,4 @@ export const backgroundChatDark = 'rgba(48, 48, 47, 0.8)';
 export const backgroundIconChat = '#445fff';
 export const backgroundIconChatDark = '#55f8ff';
 export const colorPlaceholder = '#e3e3e3';
+export const colorLink = '#3473d8';

@@ -6215,7 +6215,7 @@ rimraf@~2.6.2:
 
 "rn-photos-framework@git+ssh://git@github.com:LeVinhSang1234/rn-photos-framework-fix.git":
   version "1.0.7"
-  resolved "git+ssh://git@github.com:LeVinhSang1234/rn-photos-framework-fix.git#e8c2f2204f3e045072402b1de32a2c2b44ba0759"
+  resolved "git+ssh://git@github.com:LeVinhSang1234/rn-photos-framework-fix.git#e3c437760da03fc37c89c21c68490ca00c265e33"
 
 rsvp@^4.8.4:
   version "4.8.5"

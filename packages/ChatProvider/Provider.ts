@@ -1,5 +1,6 @@
 import {createContext, useContext} from 'react';
 import {Dimensions, Platform} from 'react-native';
+import {IAlbum} from './ImageProvider';
 import {ITheme, theme} from './theme';
 
 export declare type IProviderChat = {
@@ -34,7 +35,10 @@ export declare type IImagePickerProvider = {
   album?: any;
   albums?: any;
   status: IStatusPhotos;
+  photos: any[];
   requestAuthorPhotos: () => Promise<IStatusPhotos>;
+  getAlbums: () => Promise<any>;
+  getPhotos: (album: IAlbum) => Promise<any>;
 };
 
 export declare type IStatusPhotos = {
@@ -65,9 +69,12 @@ const initValue: IProviderChat = {
 const initImagePicker: IImagePickerProvider = {
   albums: [],
   album: {},
+  photos: [],
   status: {isAuthorized: false, status: 'notDetermined'},
   requestAuthorPhotos: () =>
     new Promise(res => res({isAuthorized: false, status: 'notDetermined'})),
+  getAlbums: () => new Promise({} as any),
+  getPhotos: () => new Promise({} as any),
 };
 
 const initialValueKeyboard: IKeyboardProvider = {

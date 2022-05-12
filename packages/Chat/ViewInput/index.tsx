@@ -12,7 +12,7 @@ import {
   Platform,
   View,
 } from 'react-native';
-import BottomImage from './BottomImage';
+import BottomImageHook, {BottomImageRef} from './BottomImage';
 import InputChat from './InputChat';
 
 interface IProps {
@@ -32,7 +32,7 @@ interface IState {
 class ViewInput extends Component<IProps, IState> {
   animatedBegin?: boolean;
   keepKeyboard?: boolean;
-  bottomImage?: BottomImage | null;
+  bottomImage?: BottomImageRef | null;
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -200,7 +200,7 @@ class ViewInput extends Component<IProps, IState> {
             onDidShow={this.onDidShowKB}
           />
         </BlurView>
-        <BottomImage
+        <BottomImageHook
           heightScreen={heightScreen}
           ref={ref => (this.bottomImage = ref)}
           provider={providerValue}

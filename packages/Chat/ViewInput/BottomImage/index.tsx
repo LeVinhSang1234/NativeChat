@@ -1,8 +1,12 @@
-import {IKeyboardProvider} from '@/ChatProvider/Provider';
+import {
+  IImagePickerProvider,
+  IKeyboardProvider,
+  useProviderImagePicker,
+} from '@/ChatProvider/Provider';
 import Text from '@/lib/Text';
 import {debounce} from '@/utils';
 import bar from '@/utils/bar';
-import React, {Component, Fragment} from 'react';
+import React, {Component, ForwardedRef, Fragment} from 'react';
 import {
   FlatList,
   GestureResponderEvent,
@@ -15,6 +19,7 @@ import {
   View,
 } from 'react-native';
 import FeedBack from 'react-native-haptic-feedback';
+import StatusAuth from './StatusAuth';
 
 export declare type IBottomDragProps = {
   colorScheme: 'light' | 'dark';
@@ -22,20 +27,36 @@ export declare type IBottomDragProps = {
   heightScreen: number;
 };
 
+interface ISwapBottomDragProps extends IBottomDragProps {
+  providerImage: IImagePickerProvider;
+}
+
 interface IState {
   height: number;
   heightBackdrop: number | string;
 }
 
-class BottomImage extends Component<IBottomDragProps, IState> {
+class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
   animatedBegin?: boolean;
   beginDrag?: boolean;
   YNowPrevious: number;
-  constructor(props: IBottomDragProps) {
+  YTouchStart: number;
+  constructor(props: ISwapBottomDragProps) {
     super(props);
     this.state = {height: 0, heightBackdrop: 0};
     this.YNowPrevious = 0;
+    this.YTouchStart = 0;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
+  }
+
+  shouldComponentUpdate(nProps: ISwapBottomDragProps, nState: IState) {
+    const {height, heightBackdrop} = this.state;
+    const {providerImage} = this.props;
+    return (
+      height !== nState.height ||
+      heightBackdrop !== nState.heightBackdrop ||
+      providerImage.status !== nProps.providerImage.status
+    );
   }
 
   removeBeginLayout = () => {
@@ -64,13 +85,16 @@ class BottomImage extends Component<IBottomDragProps, IState> {
   };
 
   openImageSelect = () => {
-    const {provider} = this.props;
+    const {provider, providerImage} = this.props;
     const {keyboardHeight, keyboardHeightSystem, isKeyboardOpen, openKeyboard} =
       provider;
     const heightOpen = isKeyboardOpen ? keyboardHeight : keyboardHeightSystem;
     openKeyboard();
     if (keyboardHeight <= 34) {
       this.animatedLayout();
+    }
+    if (providerImage.status.isAuthorized) {
+      providerImage.getAlbums();
     }
     this.setState({height: heightOpen});
   };
@@ -83,7 +107,14 @@ class BottomImage extends Component<IBottomDragProps, IState> {
     }
   };
 
-  onMoveShouldSetResponder = () => {
+  onMoveShouldSetResponder = ({nativeEvent}: GestureResponderEvent) => {
+    const {providerImage} = this.props;
+    if (!providerImage.status.isAuthorized) {
+      return (
+        this.YTouchStart !== 0 &&
+        Math.abs(this.YTouchStart - nativeEvent.pageY) > 40
+      );
+    }
     return !!this.beginDrag;
   };
 
@@ -137,6 +168,7 @@ class BottomImage extends Component<IBottomDragProps, IState> {
   };
 
   onResponderEnd = ({nativeEvent}: GestureResponderEvent) => {
+    this.YTouchStart = 0;
     const {height} = this.state;
     const {provider, heightScreen} = this.props;
     if (nativeEvent.pageY > this.YNowPrevious) {
@@ -160,9 +192,13 @@ class BottomImage extends Component<IBottomDragProps, IState> {
     this.YNowPrevious = 0;
   };
 
+  touchStartView = ({nativeEvent}: GestureResponderEvent) => {
+    this.YTouchStart = nativeEvent.pageY;
+  };
+
   render() {
     const {height, heightBackdrop} = this.state;
-    const {colorScheme, heightScreen} = this.props;
+    const {colorScheme, heightScreen, providerImage} = this.props;
     const shadowColor =
       colorScheme === 'dark' ? 'rgb(255,255,255)' : 'rgb(0,0,0)';
     const backgroundColor =
@@ -172,13 +208,11 @@ class BottomImage extends Component<IBottomDragProps, IState> {
     return (
       <Fragment>
         <View
-          style={[
-            styles.viewBackdrop,
-            {opacity: opacity, height: heightBackdrop},
-          ]}
+          style={[styles.viewBackdrop, {opacity, height: heightBackdrop}]}
         />
         <View
           style={[styles.view, {shadowColor, backgroundColor, height}]}
+          onTouchStart={this.touchStartView}
           onMoveShouldSetResponder={this.onMoveShouldSetResponder}
           onResponderEnd={this.onResponderEnd}
           onResponderMove={this.onResponderMove}>
@@ -190,24 +224,42 @@ class BottomImage extends Component<IBottomDragProps, IState> {
               <View style={[styles.lineDrag]} />
             </View>
           </Pressable>
-          <FlatList
-            data={[1]}
-            renderItem={({item}) => {
-              console.log(item);
+          {providerImage.status.isAuthorized ? (
+            <FlatList
+              data={[1]}
+              renderItem={({item}) => {
+                console.log(item);
 
-              return <Text>Sang</Text>;
-            }}
-            onScroll={this.handleScrollView}
-            scrollEventThrottle={0}
-            removeClippedSubviews
-            style={styles.scrollView}>
-            <Text>Snag</Text>
-          </FlatList>
+                return <Text>Sang</Text>;
+              }}
+              onScroll={this.handleScrollView}
+              scrollEventThrottle={0}
+              removeClippedSubviews
+              style={styles.scrollView}>
+              <Text>Snag</Text>
+            </FlatList>
+          ) : (
+            <StatusAuth
+              requestAuthorPhotos={providerImage.requestAuthorPhotos}
+              status={providerImage.status}
+            />
+          )}
         </View>
       </Fragment>
     );
   }
 }
+
+export {BottomImageRef};
+
+const BottomImage = React.forwardRef(
+  (props: IBottomDragProps, ref: ForwardedRef<BottomImageRef>) => {
+    const providerImage = useProviderImagePicker();
+    return (
+      <BottomImageRef {...props} ref={ref} providerImage={providerImage} />
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   view: {
