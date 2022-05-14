@@ -85,6 +85,7 @@ class ImageProvider extends Component<IProps, IState> {
     this.unsubscribeFuncAlbum?.();
     album?.stopTracking?.();
     this.unsubscribeFuncPhotos?.();
+    this.setState = () => {};
   }
 
   requestAuthorPhotos = async (): Promise<any> => {

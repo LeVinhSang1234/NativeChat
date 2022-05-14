@@ -107,6 +107,7 @@ class SwapChatProvider extends Component<IPropsChatSwap, IState> {
           <ImageProvider>
             <ViewInput
               heightScreen={height}
+              widthScreen={width}
               ref={ref => (this.viewInput = ref)}
               colorScheme={colorScheme}
             />

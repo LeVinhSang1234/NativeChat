@@ -3,11 +3,11 @@ import {
   IKeyboardProvider,
   useProviderImagePicker,
 } from '@/ChatProvider/Provider';
-import Text from '@/lib/Text';
 import {debounce} from '@/utils';
 import bar from '@/utils/bar';
 import React, {Component, ForwardedRef, Fragment} from 'react';
 import {
+  Animated,
   FlatList,
   GestureResponderEvent,
   LayoutAnimation,
@@ -19,12 +19,15 @@ import {
   View,
 } from 'react-native';
 import FeedBack from 'react-native-haptic-feedback';
+import HeaderSelect from './HeaderSelect';
+import ListImage from './ListImage';
 import StatusAuth from './StatusAuth';
 
 export declare type IBottomDragProps = {
   colorScheme: 'light' | 'dark';
   provider: IKeyboardProvider;
   heightScreen: number;
+  widthScreen: number;
 };
 
 interface ISwapBottomDragProps extends IBottomDragProps {
@@ -32,7 +35,6 @@ interface ISwapBottomDragProps extends IBottomDragProps {
 }
 
 interface IState {
-  height: number;
   heightBackdrop: number | string;
 }
 
@@ -41,28 +43,37 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
   beginDrag?: boolean;
   YNowPrevious: number;
   YTouchStart: number;
+  animatedHeight: Animated.Value | any;
+  maxHeight: number;
   constructor(props: ISwapBottomDragProps) {
     super(props);
-    this.state = {height: 0, heightBackdrop: 0};
+    const {heightScreen} = props;
+    this.state = {heightBackdrop: 0};
+    this.animatedHeight = new Animated.Value(0);
     this.YNowPrevious = 0;
     this.YTouchStart = 0;
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
+    this.maxHeight = heightScreen - bar.topHeight - 60;
   }
 
   shouldComponentUpdate(nProps: ISwapBottomDragProps, nState: IState) {
-    const {height, heightBackdrop} = this.state;
-    const {providerImage} = this.props;
+    const {heightBackdrop} = this.state;
+    const {providerImage, colorScheme} = this.props;
     return (
-      height !== nState.height ||
       heightBackdrop !== nState.heightBackdrop ||
-      providerImage.status !== nProps.providerImage.status
+      providerImage.status !== nProps.providerImage.status ||
+      providerImage.photos !== nProps.providerImage.photos ||
+      colorScheme !== nProps.colorScheme
     );
   }
 
   removeBeginLayout = () => {
-    const {heightBackdrop, height} = this.state;
+    const {heightBackdrop} = this.state;
     const {provider} = this.props;
-    if (heightBackdrop !== 0 && provider.heightStartInit >= height) {
+    if (
+      heightBackdrop !== 0 &&
+      provider.heightStartInit >= this.animatedHeight._value
+    ) {
       this.setState({heightBackdrop: 0});
     }
     this.animatedBegin = false;
@@ -96,14 +107,21 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
     if (providerImage.status.isAuthorized) {
       providerImage.getAlbums();
     }
-    this.setState({height: heightOpen});
+    Animated.timing(this.animatedHeight, {
+      toValue: heightOpen,
+      duration: 0,
+      useNativeDriver: false,
+    }).start();
   };
 
   closeImageSelect = () => {
-    const {height} = this.state;
-    if (height > 0) {
+    if (this.animatedHeight._value > 0) {
       this.animatedLayout();
-      this.setState({height: 0});
+      Animated.timing(this.animatedHeight, {
+        toValue: 0,
+        duration: 0,
+        useNativeDriver: false,
+      }).start();
     }
   };
 
@@ -119,9 +137,10 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
   };
 
   onResponderMove = (event: GestureResponderEvent) => {
-    const {height, heightBackdrop} = this.state;
-    const {provider, heightScreen} = this.props;
-    if (height > heightScreen - bar.topHeight - 60) {
+    const {heightBackdrop} = this.state;
+    const height = this.animatedHeight._value;
+    const {provider} = this.props;
+    if (height > this.maxHeight) {
       return;
     }
     let heightRemove = event.nativeEvent.pageY - this.YNowPrevious;
@@ -146,7 +165,11 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
     ) {
       this.setState({heightBackdrop: 0});
     }
-    this.setState({height: height - heightRemove});
+    Animated.timing(this.animatedHeight, {
+      toValue: height - heightRemove,
+      duration: 5,
+      useNativeDriver: false,
+    }).start();
   };
 
   beginDragEvent = (event: GestureResponderEvent) => {
@@ -169,24 +192,29 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
 
   onResponderEnd = ({nativeEvent}: GestureResponderEvent) => {
     this.YTouchStart = 0;
-    const {height} = this.state;
-    const {provider, heightScreen} = this.props;
+    const height = this.animatedHeight._value;
+    let heightValue = 0;
+    const {provider} = this.props;
     if (nativeEvent.pageY > this.YNowPrevious) {
       if (height >= provider.heightStartInit) {
-        this.setState({height: provider.keyboardHeight});
+        heightValue = provider.keyboardHeight;
       } else {
         provider.removeKeyboard();
-        this.setState({height: 0});
       }
     } else {
       if (height > provider.keyboardHeight) {
         FeedBack.trigger('impactHeavy');
-        this.setState({height: heightScreen - bar.topHeight - 60});
+        heightValue = this.maxHeight;
       } else {
         provider.dragKeyboard(provider.heightStartInit);
-        this.setState({height: provider.heightStartInit});
+        heightValue = provider.heightStartInit;
       }
     }
+    Animated.timing(this.animatedHeight, {
+      toValue: heightValue,
+      duration: 0,
+      useNativeDriver: false,
+    }).start();
     this.animatedLayout();
     this.beginDrag = false;
     this.YNowPrevious = 0;
@@ -197,21 +225,28 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
   };
 
   render() {
-    const {height, heightBackdrop} = this.state;
-    const {colorScheme, heightScreen, providerImage} = this.props;
+    const {heightBackdrop} = this.state;
+    const {colorScheme, heightScreen, providerImage, widthScreen, provider} =
+      this.props;
     const shadowColor =
       colorScheme === 'dark' ? 'rgb(255,255,255)' : 'rgb(0,0,0)';
     const backgroundColor =
       colorScheme === 'dark' ? '#141414' : 'rgb(255,255,255)';
-    const opacity = height / (heightScreen - bar.topHeight - 60) - 0.3;
-
+    const opacity = this.animatedHeight.interpolate({
+      inputRange: [0, provider.keyboardHeightSystem + 20, this.maxHeight],
+      outputRange: [0, 0, 0.7],
+    });
     return (
       <Fragment>
-        <View
+        <Animated.View
           style={[styles.viewBackdrop, {opacity, height: heightBackdrop}]}
         />
-        <View
-          style={[styles.view, {shadowColor, backgroundColor, height}]}
+        <Animated.View
+          removeClippedSubviews
+          style={[
+            styles.view,
+            {shadowColor, backgroundColor, height: this.animatedHeight},
+          ]}
           onTouchStart={this.touchStartView}
           onMoveShouldSetResponder={this.onMoveShouldSetResponder}
           onResponderEnd={this.onResponderEnd}
@@ -225,26 +260,36 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
             </View>
           </Pressable>
           {providerImage.status.isAuthorized ? (
-            <FlatList
-              data={[1]}
-              renderItem={({item}) => {
-                console.log(item);
-
-                return <Text>Sang</Text>;
-              }}
-              onScroll={this.handleScrollView}
-              scrollEventThrottle={0}
-              removeClippedSubviews
-              style={styles.scrollView}>
-              <Text>Snag</Text>
-            </FlatList>
+            <Fragment>
+              <HeaderSelect
+                maxHeight={this.maxHeight}
+                provider={provider}
+                animated={this.animatedHeight}
+                providerImage={providerImage}
+              />
+              <FlatList
+                numColumns={3}
+                data={providerImage.photos}
+                renderItem={({item}) => (
+                  <ListImage
+                    widthScreen={widthScreen}
+                    heightScreen={heightScreen}
+                    image={item.image}
+                  />
+                )}
+                onScroll={this.handleScrollView}
+                scrollEventThrottle={0}
+                removeClippedSubviews
+                style={styles.scrollView}
+              />
+            </Fragment>
           ) : (
             <StatusAuth
               requestAuthorPhotos={providerImage.requestAuthorPhotos}
               status={providerImage.status}
             />
           )}
-        </View>
+        </Animated.View>
       </Fragment>
     );
   }
@@ -277,7 +322,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
   },
   wrapDrag: {
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   center: {
     flexDirection: 'row',
@@ -286,14 +331,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   lineDrag: {
-    height: 5,
-    marginVertical: 5,
-    width: 60,
+    height: 4.5,
+    marginVertical: 4,
+    width: 50,
     backgroundColor: '#e3e3e3',
     borderRadius: 100,
   },
   scrollView: {
-    paddingHorizontal: 8,
     paddingBottom: bar.bottomHeight + 10,
   },
   viewBackdrop: {

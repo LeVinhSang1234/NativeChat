@@ -15,6 +15,13 @@ export declare type ITheme = {
     photoPermissionDescription: string;
     photoPermissionButton: string;
     gotoSetting: string;
+    albumDescription: string;
+  };
+  common?: {
+    button: {
+      cancel: string;
+      album: string;
+    };
   };
 };
 
@@ -32,5 +39,12 @@ export const theme: ITheme = {
       'Cho phép NativeChat truy cập vào ảnh và video để bạn có thể chia sẻ với bạn bè',
     photoPermissionButton: 'Cho phép truy cập',
     gotoSetting: 'Đi tới cài đặt',
+    albumDescription: 'Đến Tiểu Snow',
+  },
+  common: {
+    button: {
+      cancel: 'Huỷ',
+      album: 'Album',
+    },
   },
 };

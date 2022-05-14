@@ -18,6 +18,7 @@ import InputChat from './InputChat';
 interface IProps {
   colorScheme: 'light' | 'dark';
   heightScreen: number;
+  widthScreen: number;
 }
 
 interface IState {
@@ -169,7 +170,7 @@ class ViewInput extends Component<IProps, IState> {
       duration,
       heightStartInit,
     } = this.state;
-    const {colorScheme, heightScreen} = this.props;
+    const {colorScheme, heightScreen, widthScreen} = this.props;
     const providerValue = {
       keyboardHeightSystem: keyboardHeightSystem || 250,
       isKeyboardOpen,
@@ -202,6 +203,7 @@ class ViewInput extends Component<IProps, IState> {
         </BlurView>
         <BottomImageHook
           heightScreen={heightScreen}
+          widthScreen={widthScreen}
           ref={ref => (this.bottomImage = ref)}
           provider={providerValue}
           colorScheme={colorScheme}

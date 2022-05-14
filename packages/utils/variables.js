@@ -6,3 +6,4 @@ export const backgroundIconChat = '#445fff';
 export const backgroundIconChatDark = '#55f8ff';
 export const colorPlaceholder = '#e3e3e3';
 export const colorLink = '#3473d8';
+export const colorDescription = '#9f9f9f';
