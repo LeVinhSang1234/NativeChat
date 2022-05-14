@@ -1,6 +1,6 @@
-import {IProviderChat} from '@/ChatProvider/Provider';
+import {IProviderChat, ProviderKeyboard} from '@/ChatProvider/Provider';
 import {IconIon} from '@/utils';
-import {backgroundIconChat} from '@/utils/variables';
+import {backgroundIconChat, colorPlaceholder} from '@/utils/variables';
 import React, {Component} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 
@@ -32,7 +32,17 @@ class Extension extends Component<IProps, IState> {
         <Pressable
           style={styles.pressable}
           onPress={() => provider.toggleCamera(true)}>
-          <IconIon style={styles.iconCamera} name="camera" />
+          <ProviderKeyboard.Consumer>
+            {({isOpenImage}) => (
+              <IconIon
+                style={[
+                  styles.iconCamera,
+                  {color: !isOpenImage ? backgroundIconChat : colorPlaceholder},
+                ]}
+                name="camera"
+              />
+            )}
+          </ProviderKeyboard.Consumer>
         </Pressable>
         <Pressable
           style={styles.pressable}
@@ -40,7 +50,17 @@ class Extension extends Component<IProps, IState> {
           <IconIon style={styles.iconImage} name="image" />
         </Pressable>
         <Pressable style={styles.pressable}>
-          <IconIon style={styles.iconMic} name="mic" />
+          <ProviderKeyboard.Consumer>
+            {({isOpenImage}) => (
+              <IconIon
+                style={[
+                  styles.iconMic,
+                  {color: !isOpenImage ? backgroundIconChat : colorPlaceholder},
+                ]}
+                name="mic"
+              />
+            )}
+          </ProviderKeyboard.Consumer>
         </Pressable>
         {visibleChevron ? (
           <Pressable style={styles.pressableChevron} onPress={handleBlurInput}>

@@ -6,7 +6,7 @@ import {
 import Text from '@/lib/Text';
 import {backgroundIconChat, colorDescription} from '@/utils/variables';
 import React, {Component, Fragment} from 'react';
-import {Animated, Pressable, StyleSheet} from 'react-native';
+import {Animated, Pressable, StyleSheet, View} from 'react-native';
 
 interface IHeaderSelectImageProps {
   animated: Animated.Value;
@@ -41,7 +41,7 @@ class HeaderSelect extends Component<IHeaderSelectImageProps> {
             )}
           </ProviderChat.Consumer>
         </Pressable>
-        <Pressable>
+        <View>
           <ProviderChat.Consumer>
             {({width, theme}) => (
               <Fragment>
@@ -66,7 +66,7 @@ class HeaderSelect extends Component<IHeaderSelectImageProps> {
               </Fragment>
             )}
           </ProviderChat.Consumer>
-        </Pressable>
+        </View>
         <Pressable style={[styles.pressable, styles.pressAlbum]}>
           <ProviderChat.Consumer>
             {({theme}) => (

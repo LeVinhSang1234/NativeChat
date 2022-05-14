@@ -258,15 +258,15 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
             <View style={styles.center}>
               <View style={[styles.lineDrag]} />
             </View>
+            <HeaderSelect
+              maxHeight={this.maxHeight}
+              provider={provider}
+              animated={this.animatedHeight}
+              providerImage={providerImage}
+            />
           </Pressable>
           {providerImage.status.isAuthorized ? (
             <Fragment>
-              <HeaderSelect
-                maxHeight={this.maxHeight}
-                provider={provider}
-                animated={this.animatedHeight}
-                providerImage={providerImage}
-              />
               <FlatList
                 numColumns={3}
                 data={providerImage.photos}
@@ -279,7 +279,6 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
                 )}
                 onScroll={this.handleScrollView}
                 scrollEventThrottle={0}
-                removeClippedSubviews
                 style={styles.scrollView}
               />
             </Fragment>

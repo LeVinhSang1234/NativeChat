@@ -27,6 +27,7 @@ interface IState {
   heightInput: number;
   keyboardHeightSystem: number;
   heightStartInit: number;
+  isOpenImage: boolean;
   isKeyboardOpen: boolean;
 }
 
@@ -43,6 +44,7 @@ class ViewInput extends Component<IProps, IState> {
       duration: Platform.select({ios: 250, default: 10}),
       heightInput: 0,
       heightStartInit: 0,
+      isOpenImage: false,
     };
     this.removeBeginLayout = debounce(this.removeBeginLayout, 10);
   }
@@ -76,7 +78,14 @@ class ViewInput extends Component<IProps, IState> {
       this.animatedBegin = true;
       const typeAnimated = Platform.OS === 'ios' ? 'keyboard' : 'easeOut';
       LayoutAnimation.configureNext(
-        LayoutAnimation.create(duration, typeAnimated, 'scaleY'),
+        LayoutAnimation.create(
+          duration,
+          typeAnimated,
+          Platform.select({
+            ios: 'opacity',
+            default: 'scaleY',
+          }),
+        ),
         this.removeBeginLayout,
         this.removeBeginLayout,
       );
@@ -137,11 +146,13 @@ class ViewInput extends Component<IProps, IState> {
   removeKeyboard = () => {
     Keyboard.dismiss();
     this.animatedLayout();
+    this.setState({isOpenImage: false});
     this.bottomImage?.closeImageSelect?.();
     this.setState({height: bar.bottomHeight});
   };
 
   openImageSelect = () => {
+    this.setState({isOpenImage: true});
     this.bottomImage?.openImageSelect?.();
   };
 
@@ -169,6 +180,7 @@ class ViewInput extends Component<IProps, IState> {
       isKeyboardOpen,
       duration,
       heightStartInit,
+      isOpenImage,
     } = this.state;
     const {colorScheme, heightScreen, widthScreen} = this.props;
     const providerValue = {
@@ -180,6 +192,7 @@ class ViewInput extends Component<IProps, IState> {
       openKeyboard: this.openKeyboard,
       removeKeyboard: this.removeKeyboard,
       dragKeyboard: this.dragKeyboard,
+      isOpenImage,
     };
     return (
       <ProviderKeyboard.Provider value={providerValue}>

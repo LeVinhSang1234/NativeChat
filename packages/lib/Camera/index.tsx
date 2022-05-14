@@ -6,18 +6,18 @@ import {
   Pressable,
   StatusBar,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import {CameraType, FlashMode, RNCamera} from 'react-native-camera';
 import {Linking} from 'react-native';
-import Text from '../Text';
 import ActionBottom from './ActionBottom';
 import ActionTop from './ActionTop';
 import FocusPoint from './FocusPoint';
 import TabClickHandle from './TabClickHandle';
-import {backgroundIconChat, backgroundIconChatDark} from '@/utils/variables';
 import bar from '@/utils/bar';
 import BlurView from '../BlurView';
+import {colorLink} from '@/utils/variables';
 
 const ImageCapture = React.lazy(() => import('./ImageCapture'));
 
@@ -62,8 +62,19 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
     };
   }
 
+  shouldComponentUpdate(nProps: ICameraProps & IProviderChat, nState: IState) {
+    const {width, height, saveText, sendText, theme} = this.props;
+    return (
+      this.state !== nState ||
+      width !== nProps.width ||
+      saveText !== nProps.saveText ||
+      sendText !== nProps.sendText ||
+      theme !== nProps.theme ||
+      height !== nProps.height
+    );
+  }
+
   open = () => {
-    StatusBar.setHidden(true);
     this.setState({open: true});
   };
 
@@ -145,9 +156,7 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
   };
 
   handleStatusCamera = async (v: any) => {
-    if (v.cameraStatus === RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
-      StatusBar.setHidden(false);
-    } else {
+    if (v.cameraStatus !== RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
       StatusBar.setHidden(true);
     }
     this.setState({permission: v.cameraStatus});
@@ -185,21 +194,13 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
       yPoint,
       permission,
     } = this.state;
-    const {
-      width,
-      height,
-      saveText,
-      sendText,
-      colorScheme,
-      theme,
-      toggleCamera,
-    } = this.props;
+    const {width, height, saveText, sendText, theme, toggleCamera} = this.props;
     const {textLibrary} = theme;
     if (!open) {
       return null;
     }
     if (permission === RNCamera.Constants.CameraStatus.NOT_AUTHORIZED) {
-      const colorIcon = colorScheme === 'light' ? '#000' : '#fff';
+      const colorIcon = '#000';
       return (
         <BlurView style={styles.blurViewAuth}>
           <Pressable
@@ -220,10 +221,7 @@ class Camera extends Component<ICameraProps & IProviderChat, IState> {
             <Pressable
               style={styles.openSetting}
               onPress={() => Linking.openSettings()}>
-              <Text
-                style={styles.textOpenSeting}
-                colorModeDark={backgroundIconChatDark}
-                colorModeLight={backgroundIconChat}>
+              <Text style={[styles.textOpenSeting, {color: colorLink}]}>
                 {textLibrary?.openSettingApp}
               </Text>
             </Pressable>

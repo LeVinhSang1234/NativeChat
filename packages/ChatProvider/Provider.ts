@@ -29,6 +29,7 @@ export declare type IKeyboardProvider = {
   heightStartInit: number;
   isKeyboardOpen: boolean;
   durationKeyboard: number;
+  isOpenImage: boolean;
 };
 
 export declare type IImagePickerProvider = {
@@ -70,6 +71,7 @@ const initImagePicker: IImagePickerProvider = {
   albums: [],
   album: {},
   photos: [],
+
   status: {isAuthorized: false, status: 'notDetermined'},
   requestAuthorPhotos: () =>
     new Promise(res => res({isAuthorized: false, status: 'notDetermined'})),
@@ -81,6 +83,7 @@ const initialValueKeyboard: IKeyboardProvider = {
   keyboardHeight: 250,
   keyboardHeightSystem: 250,
   heightStartInit: 0,
+  isOpenImage: false,
   isKeyboardOpen: false,
   openKeyboard: () => null,
   removeKeyboard: () => null,
