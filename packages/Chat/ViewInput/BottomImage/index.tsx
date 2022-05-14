@@ -8,7 +8,6 @@ import bar from '@/utils/bar';
 import React, {Component, ForwardedRef, Fragment} from 'react';
 import {
   Animated,
-  FlatList,
   GestureResponderEvent,
   LayoutAnimation,
   NativeScrollEvent,
@@ -19,8 +18,8 @@ import {
   View,
 } from 'react-native';
 import FeedBack from 'react-native-haptic-feedback';
+import FlatListImage from './FlatListImage';
 import HeaderSelect from './HeaderSelect';
-import ListImage from './ListImage';
 import StatusAuth from './StatusAuth';
 
 export declare type IBottomDragProps = {
@@ -140,14 +139,16 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
     const {heightBackdrop} = this.state;
     const height = this.animatedHeight._value;
     const {provider} = this.props;
-    if (height > this.maxHeight) {
+
+    let heightRemove = event.nativeEvent.pageY - this.YNowPrevious;
+    if (height >= this.maxHeight && heightRemove < 0) {
       return;
     }
-    let heightRemove = event.nativeEvent.pageY - this.YNowPrevious;
     if (this.YNowPrevious === 0) {
       heightRemove = 0;
     }
     this.YNowPrevious = event.nativeEvent.pageY;
+
     if (
       height - heightRemove <= provider.keyboardHeight ||
       provider.keyboardHeight <= provider.heightStartInit
@@ -167,7 +168,7 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
     }
     Animated.timing(this.animatedHeight, {
       toValue: height - heightRemove,
-      duration: 5,
+      duration: height - heightRemove > provider.keyboardHeight ? 20 : 0,
       useNativeDriver: false,
     }).start();
   };
@@ -266,22 +267,12 @@ class BottomImageRef extends Component<ISwapBottomDragProps, IState> {
             />
           </Pressable>
           {providerImage.status.isAuthorized ? (
-            <Fragment>
-              <FlatList
-                numColumns={3}
-                data={providerImage.photos}
-                renderItem={({item}) => (
-                  <ListImage
-                    widthScreen={widthScreen}
-                    heightScreen={heightScreen}
-                    image={item.image}
-                  />
-                )}
-                onScroll={this.handleScrollView}
-                scrollEventThrottle={0}
-                style={styles.scrollView}
-              />
-            </Fragment>
+            <FlatListImage
+              photos={providerImage.photos}
+              widthScreen={widthScreen}
+              heightScreen={heightScreen}
+              handleScrollView={this.handleScrollView}
+            />
           ) : (
             <StatusAuth
               requestAuthorPhotos={providerImage.requestAuthorPhotos}

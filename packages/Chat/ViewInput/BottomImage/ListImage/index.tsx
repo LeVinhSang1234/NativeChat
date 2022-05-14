@@ -14,6 +14,15 @@ class ListImage extends Component<IProps> {
     Image.prefetch(image.uri);
   }
 
+  shouldComponentUpdate(nProps: IProps) {
+    const {image, heightScreen, widthScreen} = this.props;
+    return (
+      image !== nProps.image ||
+      heightScreen !== nProps.heightScreen ||
+      widthScreen !== nProps.widthScreen
+    );
+  }
+
   render() {
     const {image, widthScreen} = this.props;
     const widthImage = (widthScreen - 6) / 3;
